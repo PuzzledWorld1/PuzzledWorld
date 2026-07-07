@@ -1,64 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import HomeScreen from './screens/homescreen';
+import MenuScreen from './screens/menuscreen';
+import PuzzleScreen from './screens/puzzlescreen';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>🧩</Text>
+  const [screen, setScreen] = useState('home');
+  const [image, setImage] = useState(null);
 
-      <Text style={styles.title}>PuzzledWorld</Text>
+  if (screen === 'menu') {
+    return (
+      <MenuScreen
+        setScreen={setScreen}
+        image={image}
+        setImage={setImage}
+      />
+    );
+  }
 
-      <Text style={styles.subtitle}>
-        Turn photos, artwork, and memories into puzzles.
-      </Text>
+  if (screen === 'puzzle') {
+    return <PuzzleScreen image={image} setScreen={setScreen} />;
+  }
 
-      <Pressable style={styles.button}>
-        <Text style={styles.buttonText}>Get Puzzled</Text>
-      </Pressable>
-
-      <StatusBar style="light" />
-    </View>
-  );
+  return <HomeScreen setScreen={setScreen} />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#082614',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 25,
-  },
-
-  logo: {
-    fontSize: 70,
-    marginBottom: 10,
-  },
-
-  title: {
-    fontSize: 34,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-
-  subtitle: {
-    color: '#cfc5dc',
-    textAlign: 'center',
-    fontSize: 18,
-    marginTop: 10,
-    marginBottom: 40,
-  },
-
-  button: {
-    backgroundColor: '#147139',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 18,
-  },
-
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
