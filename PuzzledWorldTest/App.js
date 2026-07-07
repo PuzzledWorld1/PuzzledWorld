@@ -6,6 +6,7 @@ import PuzzleScreen from './screens/puzzlescreen';
 export default function App() {
   const [screen, setScreen] = useState('home');
   const [image, setImage] = useState(null);
+  const [difficulty, setDifficulty] = useState(6);
 
   if (screen === 'menu') {
     return (
@@ -13,12 +14,19 @@ export default function App() {
         setScreen={setScreen}
         image={image}
         setImage={setImage}
+        setDifficulty={setDifficulty}
       />
     );
   }
 
   if (screen === 'puzzle') {
-    return <PuzzleScreen image={image} setScreen={setScreen} />;
+    return (
+      <PuzzleScreen
+        image={image}
+        setScreen={setScreen}
+        difficulty={difficulty}
+      />
+    );
   }
 
   return <HomeScreen setScreen={setScreen} />;

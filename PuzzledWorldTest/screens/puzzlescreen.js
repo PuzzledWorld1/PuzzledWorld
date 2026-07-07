@@ -1,71 +1,108 @@
 import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export default function PuzzleScreen({ image, setScreen }) {
-  const size = 3;
+export default function PuzzleScreen({ image, setScreen, difficulty }) {
+  const size = difficulty;
+  const boardSize = 330;
+  const pieceSize = boardSize / size;
   const totalPieces = size * size;
-  const [pieces, setPieces] = useState([]);
-  const [selected, setSelected] = useState(null);
+
+  const [trayPieces, setTrayPieces] = useState([]);
+  const [boardPieces, setBoardPieces] = useState(Array(totalPieces).fill(null));
+  const [selectedPiece, setSelectedPiece] = useState(null);
 
   useEffect(() => {
     const ordered = Array.from({ length: totalPieces }, (_, index) => index);
     const shuffled = [...ordered].sort(() => Math.random() - 0.5);
-    setPieces(shuffled);
-  }, []);
+    setTrayPieces(shuffled);
+    setBoardPieces(Array(totalPieces).fill(null));
+  }, [totalPieces]);
 
-  const tapPiece = (index) => {
-    if (selected === null) {
-      setSelected(index);
-      return;
-    }
+  const placePiece = (boardIndex) => {
+    if (selectedPiece === null) return;
+    if (boardPieces[boardIndex] !== null) return;
 
-    const newPieces = [...pieces];
-    const temp = newPieces[selected];
-    newPieces[selected] = newPieces[index];
-    newPieces[index] = temp;
+    const newBoard = [...boardPieces];
+    newBoard[boardIndex] = selectedPiece;
 
-    setPieces(newPieces);
-    setSelected(null);
+    setBoardPieces(newBoard);
+    setTrayPieces(trayPieces.filter((piece) => piece !== selectedPiece));
+    setSelectedPiece(null);
   };
 
-  const isSolved = pieces.every((piece, index) => piece === index);
+  const renderPieceImage = (piece) => {
+    const row = Math.floor(piece / size);
+    const col = piece % size;
+
+    return (
+      <View style={{ width: pieceSize, height: pieceSize, overflow: 'hidden' }}>
+        <Image
+          source={{ uri: image }}
+          style={{
+            width: boardSize,
+            height: boardSize,
+            position: 'absolute',
+            left: -col * pieceSize,
+            top: -row * pieceSize,
+          }}
+        />
+      </View>
+    );
+  };
+
+  const isSolved =
+    boardPieces.every((piece, index) => piece === index) &&
+    boardPieces.every((piece) => piece !== null);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Puzzle Time</Text>
+      <Text style={styles.subtitle}>{totalPieces} pieces</Text>
 
-      <View style={styles.board}>
-        {pieces.map((piece, index) => {
-          const row = Math.floor(piece / size);
-          const col = piece % size;
-
-          return (
-            <Pressable
-              key={index}
-              style={[
-                styles.piece,
-                selected === index && styles.selectedPiece,
-              ]}
-              onPress={() => tapPiece(index)}
-            >
-              <View style={styles.imageWrapper}>
-                <Image
-                  source={{ uri: image }}
-                  style={{
-                    width: 300,
-                    height: 300,
-                    position: 'absolute',
-                    left: -col * 100,
-                    top: -row * 100,
-                  }}
-                />
-              </View>
-            </Pressable>
-          );
-        })}
+      <View style={[styles.board, { width: boardSize, height: boardSize }]}>
+        {boardPieces.map((piece, index) => (
+          <Pressable
+            key={index}
+            style={[
+              styles.boardSlot,
+              {
+                width: pieceSize,
+                height: pieceSize,
+              },
+            ]}
+            onPress={() => placePiece(index)}
+          >
+            {piece !== null && renderPieceImage(piece)}
+          </Pressable>
+        ))}
       </View>
 
       {isSolved && <Text style={styles.solved}>Puzzle Complete! 🎉</Text>}
+
+      <Text style={styles.trayLabel}>Tap a piece, then tap the board.</Text>
+
+      <ScrollView
+        horizontal
+        style={styles.tray}
+        contentContainerStyle={styles.trayContent}
+      >
+        {trayPieces.map((piece) => (
+          <Pressable
+            key={piece}
+            style={[
+              styles.trayPiece,
+              {
+                width: pieceSize,
+                height: pieceSize,
+              },
+              selectedPiece === piece && styles.selectedPiece,
+            ]}
+            onPress={() => setSelectedPiece(piece)}
+          >
+            {renderPieceImage(piece)}
+          </Pressable>
+        ))}
+      </ScrollView>
 
       <Pressable onPress={() => setScreen('menu')}>
         <Text style={styles.backText}>Back</Text>
@@ -80,45 +117,70 @@ const styles = StyleSheet.create({
     backgroundColor: '#17111f',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 25,
+    padding: 16,
   },
   title: {
     color: 'white',
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 25,
+    marginBottom: 4,
   },
-  board: {
-    width: 300,
-    height: 300,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  subtitle: {
+    color: '#cfc5dc',
+    fontSize: 16,
+    marginBottom: 14,
   },
-  piece: {
-    width: 100,
-    height: 100,
-    borderWidth: 1,
-    borderColor: '#17111f',
-    overflow: 'hidden',
+ board: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  backgroundColor: '#251b33',
+  borderWidth: 2,
+  borderColor: '#8b5cf6',
+  overflow: 'hidden',
+},
+
+boardSlot: {
+  overflow: 'hidden',
+  margin: 1,
+  borderRadius: 6,
+  backgroundColor: '#17111f',
+},
+
+  trayLabel: {
+    color: '#cfc5dc',
+    marginTop: 16,
+    marginBottom: 8,
   },
+  tray: {
+    maxHeight: 80,
+    width: '100%',
+  },
+  trayContent: {
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+ trayPiece: {
+  marginRight: 8,
+  borderWidth: 1,
+  borderColor: '#4b3b63',
+  borderRadius: 8,
+  overflow: 'hidden',
+  backgroundColor: '#251b33',
+},
+
   selectedPiece: {
     borderColor: '#8b5cf6',
     borderWidth: 4,
   },
-  imageWrapper: {
-    width: 100,
-    height: 100,
-    overflow: 'hidden',
-  },
   solved: {
     color: 'white',
     fontSize: 22,
-    marginTop: 25,
+    marginTop: 16,
     fontWeight: 'bold',
   },
   backText: {
     color: '#cfc5dc',
-    marginTop: 30,
+    marginTop: 18,
     fontSize: 16,
   },
 });
