@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Image,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import {
   PanResponder,
   Pressable,
   ScrollView,
@@ -9,41 +14,30 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+
+import {
+  StatusBar,
+} from 'expo-status-bar';
+
+import JigsawPiece, {
+  PIECE_BOX_SCALE,
+  PIECE_PADDING_RATIO,
+} from '../components/JigsawPiece';
 
 
 function PieceImage({
   piece,
   image,
   size,
-  boardSize,
   displaySize,
 }) {
-  const row = Math.floor(piece / size);
-  const col = piece % size;
-
-  const realPieceSize = boardSize / size;
-  const scale = displaySize / realPieceSize;
-
   return (
-    <View
-      style={{
-        width: displaySize,
-        height: displaySize,
-        overflow: 'hidden',
-      }}
-    >
-      <Image
-        source={{ uri: image }}
-        style={{
-          position: 'absolute',
-          width: boardSize * scale,
-          height: boardSize * scale,
-          left: -col * displaySize,
-          top: -row * displaySize,
-        }}
-      />
-    </View>
+    <JigsawPiece
+      piece={piece}
+      image={image}
+      size={size}
+      displaySize={displaySize}
+    />
   );
 }
 
@@ -52,62 +46,114 @@ function TrayPiece({
   piece,
   image,
   size,
-  boardSize,
   trayPieceSize,
   pieceSize,
   onDragStart,
   onDragMove,
   onDragEnd,
 }) {
-  const lastPosition = useRef({
-    x: 0,
-    y: 0,
-  });
+  const lastPosition =
+    useRef({
+      x: 0,
+      y: 0,
+    });
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
 
-      onMoveShouldSetPanResponder: (_, gesture) => {
-        const vertical = Math.abs(gesture.dy);
-        const horizontal = Math.abs(gesture.dx);
+  const trayVisualSize =
+    trayPieceSize *
+    PIECE_BOX_SCALE;
 
-        return vertical > 8 && vertical > horizontal;
-      },
 
-      onPanResponderGrant: (_, gesture) => {
-        const x = gesture.moveX - pieceSize / 2;
-        const y = gesture.moveY - pieceSize / 2;
+  const panResponder =
+    useRef(
+      PanResponder.create({
+        onStartShouldSetPanResponder:
+          () => false,
 
-        lastPosition.current = { x, y };
 
-        onDragStart(piece, x, y);
-      },
+        onMoveShouldSetPanResponder:
+          (_, gesture) => {
+            const vertical =
+              Math.abs(
+                gesture.dy
+              );
 
-      onPanResponderMove: (_, gesture) => {
-        const x = gesture.moveX - pieceSize / 2;
-        const y = gesture.moveY - pieceSize / 2;
+            const horizontal =
+              Math.abs(
+                gesture.dx
+              );
 
-        lastPosition.current = { x, y };
+            return (
+              vertical > 8 &&
+              vertical > horizontal
+            );
+          },
 
-        onDragMove(x, y);
-      },
 
-      onPanResponderRelease: () => {
-        onDragEnd(
-          lastPosition.current.x,
-          lastPosition.current.y
-        );
-      },
+        onPanResponderGrant:
+          (_, gesture) => {
+            const x =
+              gesture.moveX -
+              pieceSize / 2;
 
-      onPanResponderTerminate: () => {
-        onDragEnd(
-          lastPosition.current.x,
-          lastPosition.current.y
-        );
-      },
-    })
-  ).current;
+            const y =
+              gesture.moveY -
+              pieceSize / 2;
+
+            lastPosition.current = {
+              x,
+              y,
+            };
+
+            onDragStart(
+              piece,
+              x,
+              y
+            );
+          },
+
+
+        onPanResponderMove:
+          (_, gesture) => {
+            const x =
+              gesture.moveX -
+              pieceSize / 2;
+
+            const y =
+              gesture.moveY -
+              pieceSize / 2;
+
+            lastPosition.current = {
+              x,
+              y,
+            };
+
+            onDragMove(
+              x,
+              y
+            );
+          },
+
+
+        onPanResponderRelease:
+          () => {
+            onDragEnd(
+              lastPosition.current.x,
+              lastPosition.current.y
+            );
+          },
+
+
+        onPanResponderTerminate:
+          () => {
+            onDragEnd(
+              lastPosition.current.x,
+              lastPosition.current.y
+            );
+          },
+      })
+    ).current;
+
 
   return (
     <View
@@ -115,8 +161,11 @@ function TrayPiece({
       style={[
         styles.trayPiece,
         {
-          width: trayPieceSize,
-          height: trayPieceSize,
+          width:
+            trayVisualSize,
+
+          height:
+            trayVisualSize,
         },
       ]}
     >
@@ -124,8 +173,9 @@ function TrayPiece({
         piece={piece}
         image={image}
         size={size}
-        boardSize={boardSize}
-        displaySize={trayPieceSize}
+        displaySize={
+          trayPieceSize
+        }
       />
     </View>
   );
@@ -136,83 +186,139 @@ function LoosePiece({
   item,
   image,
   size,
-  boardSize,
   pieceSize,
   onMove,
   onDrop,
 }) {
-  const itemRef = useRef(item);
+  const itemRef =
+    useRef(item);
 
-  const startPosition = useRef({
-    x: item.x,
-    y: item.y,
-  });
 
-  const lastPosition = useRef({
-    x: item.x,
-    y: item.y,
-  });
+  const startPosition =
+    useRef({
+      x: item.x,
+      y: item.y,
+    });
 
-  // Keep the drag logic synced with the piece's newest position.
+
+  const lastPosition =
+    useRef({
+      x: item.x,
+      y: item.y,
+    });
+
+
   itemRef.current = item;
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () =>
-        !itemRef.current.locked,
 
-      onMoveShouldSetPanResponder: () =>
-        !itemRef.current.locked,
+  const piecePadding =
+    pieceSize *
+    PIECE_PADDING_RATIO;
 
-      onPanResponderGrant: () => {
-        const currentItem = itemRef.current;
 
-        startPosition.current = {
-          x: currentItem.x,
-          y: currentItem.y,
-        };
+  const visualSize =
+    pieceSize *
+    PIECE_BOX_SCALE;
 
-        lastPosition.current = {
-          x: currentItem.x,
-          y: currentItem.y,
-        };
-      },
 
-      onPanResponderMove: (_, gesture) => {
-        if (itemRef.current.locked) return;
+  const panResponder =
+    useRef(
+      PanResponder.create({
+        onStartShouldSetPanResponder:
+          () =>
+            !itemRef.current.locked,
 
-        const x =
-          startPosition.current.x + gesture.dx;
 
-        const y =
-          startPosition.current.y + gesture.dy;
+        onMoveShouldSetPanResponder:
+          () =>
+            !itemRef.current.locked,
 
-        lastPosition.current = { x, y };
 
-        onMove(itemRef.current.piece, x, y);
-      },
+        onPanResponderGrant:
+          () => {
+            const currentItem =
+              itemRef.current;
 
-      onPanResponderRelease: () => {
-        if (itemRef.current.locked) return;
+            startPosition.current = {
+              x: currentItem.x,
+              y: currentItem.y,
+            };
 
-        onDrop(
-          itemRef.current.piece,
-          lastPosition.current.x,
-          lastPosition.current.y
-        );
-      },
+            lastPosition.current = {
+              x: currentItem.x,
+              y: currentItem.y,
+            };
+          },
 
-      onPanResponderTerminate: () => {
-        if (itemRef.current.locked) return;
 
-        onDrop(
-          itemRef.current.piece,
-          lastPosition.current.x,
-          lastPosition.current.y
-        );
-      },
-    })
-  ).current;
+        onPanResponderMove:
+          (_, gesture) => {
+            if (
+              itemRef.current.locked
+            ) {
+              return;
+            }
+
+
+            const x =
+              startPosition.current.x +
+              gesture.dx;
+
+
+            const y =
+              startPosition.current.y +
+              gesture.dy;
+
+
+            lastPosition.current = {
+              x,
+              y,
+            };
+
+
+            onMove(
+              itemRef.current.piece,
+              x,
+              y
+            );
+          },
+
+
+        onPanResponderRelease:
+          () => {
+            if (
+              itemRef.current.locked
+            ) {
+              return;
+            }
+
+
+            onDrop(
+              itemRef.current.piece,
+              lastPosition.current.x,
+              lastPosition.current.y
+            );
+          },
+
+
+        onPanResponderTerminate:
+          () => {
+            if (
+              itemRef.current.locked
+            ) {
+              return;
+            }
+
+
+            onDrop(
+              itemRef.current.piece,
+              lastPosition.current.x,
+              lastPosition.current.y
+            );
+          },
+      })
+    ).current;
+
 
   return (
     <View
@@ -220,11 +326,24 @@ function LoosePiece({
       style={[
         styles.loosePiece,
         {
-          left: item.x,
-          top: item.y,
-          width: pieceSize,
-          height: pieceSize,
-          zIndex: item.locked ? 10 : 100,
+          left:
+            item.x -
+            piecePadding,
+
+          top:
+            item.y -
+            piecePadding,
+
+          width:
+            visualSize,
+
+          height:
+            visualSize,
+
+          zIndex:
+            item.locked
+              ? 10
+              : 100,
         },
       ]}
     >
@@ -232,7 +351,6 @@ function LoosePiece({
         piece={item.piece}
         image={image}
         size={size}
-        boardSize={boardSize}
         displaySize={pieceSize}
       />
     </View>
@@ -245,342 +363,744 @@ export default function PuzzleScreen({
   setScreen,
   difficulty,
 }) {
-  const { width: windowWidth } = useWindowDimensions();
+  const {
+    width: windowWidth,
+  } =
+    useWindowDimensions();
 
-  const size = difficulty;
-  const boardSize = Math.min(windowWidth - 32, 350);
-  const pieceSize = boardSize / size;
-  const trayPieceSize = 70;
-  const totalPieces = size * size;
 
-  const [boardLayout, setBoardLayout] = useState(null);
-  const [trayLayout, setTrayLayout] = useState(null);
+  const size =
+    difficulty;
 
-  const [trayPieces, setTrayPieces] = useState([]);
-  const [loosePieces, setLoosePieces] = useState([]);
 
-  const [trayDrag, setTrayDrag] = useState(null);
+  const boardSize =
+    Math.min(
+      windowWidth - 32,
+      350
+    );
 
-  const [trayScrollEnabled, setTrayScrollEnabled] =
+
+  const pieceSize =
+    boardSize / size;
+
+
+  const piecePadding =
+    pieceSize *
+    PIECE_PADDING_RATIO;
+
+
+  const visualPieceSize =
+    pieceSize *
+    PIECE_BOX_SCALE;
+
+
+  const trayPieceSize =
+    70;
+
+
+  const totalPieces =
+    size * size;
+
+
+  const [
+    boardLayout,
+    setBoardLayout,
+  ] =
+    useState(null);
+
+
+  const [
+    trayLayout,
+    setTrayLayout,
+  ] =
+    useState(null);
+
+
+  const [
+    trayPieces,
+    setTrayPieces,
+  ] =
+    useState([]);
+
+
+  const [
+    loosePieces,
+    setLoosePieces,
+  ] =
+    useState([]);
+
+
+  const [
+    trayDrag,
+    setTrayDrag,
+  ] =
+    useState(null);
+
+
+  const [
+    trayScrollEnabled,
+    setTrayScrollEnabled,
+  ] =
     useState(true);
 
 
   useEffect(() => {
-    const pieces = Array.from(
-      { length: totalPieces },
-      (_, index) => index
-    );
+    const pieces =
+      Array.from(
+        {
+          length:
+            totalPieces,
+        },
 
-    const shuffled = [...pieces].sort(
-      () => Math.random() - 0.5
-    );
-
-    setTrayPieces(shuffled);
-    setLoosePieces([]);
-    setTrayDrag(null);
-  }, [totalPieces]);
-
-
-  const isOverTray = useCallback(
-    (x, y) => {
-      if (!trayLayout) return false;
-
-      const centerY = y + pieceSize / 2;
-
-      return (
-        centerY >= trayLayout.y - 20 &&
-        centerY <=
-          trayLayout.y + trayLayout.height + 40
+        (_, index) =>
+          index
       );
-    },
-    [pieceSize, trayLayout]
-  );
 
 
-  const getTarget = useCallback(
-    (piece) => {
-      if (!boardLayout) return null;
-
-      const row = Math.floor(piece / size);
-      const col = piece % size;
-
-      return {
-        x: boardLayout.x + col * pieceSize,
-        y: boardLayout.y + row * pieceSize,
-      };
-    },
-    [boardLayout, pieceSize, size]
-  );
+    const shuffled =
+      [...pieces].sort(
+        () =>
+          Math.random() -
+          0.5
+      );
 
 
-  const finishPiecePosition = useCallback(
-    (piece, x, y) => {
-      const target = getTarget(piece);
+    setTrayPieces(
+      shuffled
+    );
 
-      if (target) {
-        const distanceX = Math.abs(x - target.x);
-        const distanceY = Math.abs(y - target.y);
 
-        const snapDistance = Math.max(
-          pieceSize * 0.65,
-          18
-        );
+    setLoosePieces(
+      []
+    );
 
+
+    setTrayDrag(
+      null
+    );
+  }, [
+    totalPieces,
+  ]);
+
+
+  const isOverTray =
+    useCallback(
+      (x, y) => {
         if (
-          distanceX < snapDistance &&
-          distanceY < snapDistance
+          !trayLayout
         ) {
-          return {
-            piece,
-            x: target.x,
-            y: target.y,
-            locked: true,
-          };
+          return false;
         }
-      }
-
-      return {
-        piece,
-        x,
-        y,
-        locked: false,
-      };
-    },
-    [getTarget, pieceSize]
-  );
 
 
-  const startTrayDrag = useCallback(
-    (piece, x, y) => {
-      setTrayScrollEnabled(false);
-
-      setTrayDrag({
-        piece,
-        x,
-        y,
-      });
-    },
-    []
-  );
+        const centerY =
+          y +
+          pieceSize / 2;
 
 
-  const moveTrayDrag = useCallback((x, y) => {
-    setTrayDrag((current) => {
-      if (!current) return null;
+        return (
+          centerY >=
+            trayLayout.y -
+              20 &&
 
-      return {
-        ...current,
-        x,
-        y,
-      };
-    });
-  }, []);
+          centerY <=
+            trayLayout.y +
+              trayLayout.height +
+              40
+        );
+      },
+
+      [
+        pieceSize,
+        trayLayout,
+      ]
+    );
 
 
-  const endTrayDrag = useCallback(
-    (x, y) => {
-      setTrayScrollEnabled(true);
-
-      setTrayDrag((current) => {
-        if (!current) return null;
-
-        if (isOverTray(x, y)) {
+  const getTarget =
+    useCallback(
+      (piece) => {
+        if (
+          !boardLayout
+        ) {
           return null;
         }
 
-        const newPiece = finishPiecePosition(
-          current.piece,
-          x,
-          y
-        );
 
-        setTrayPieces((pieces) =>
-          pieces.filter(
-            (piece) => piece !== current.piece
-          )
-        );
-
-        setLoosePieces((pieces) => [
-          ...pieces,
-          newPiece,
-        ]);
-
-        return null;
-      });
-    },
-    [finishPiecePosition, isOverTray]
-  );
+        const row =
+          Math.floor(
+            piece / size
+          );
 
 
-  const moveLoosePiece = useCallback(
-    (piece, x, y) => {
-      setLoosePieces((pieces) =>
-        pieces.map((item) =>
-          item.piece === piece
-            ? {
-                ...item,
-                x,
-                y,
-              }
-            : item
-        )
-      );
-    },
-    []
-  );
+        const col =
+          piece % size;
 
 
-  const dropLoosePiece = useCallback(
-    (piece, x, y) => {
-      if (isOverTray(x, y)) {
-        setLoosePieces((pieces) =>
-          pieces.filter(
-            (item) => item.piece !== piece
-          )
-        );
+        return {
+          x:
+            boardLayout.x +
+            col *
+              pieceSize,
 
-        setTrayPieces((pieces) =>
-          pieces.includes(piece)
-            ? pieces
-            : [...pieces, piece]
-        );
+          y:
+            boardLayout.y +
+            row *
+              pieceSize,
+        };
+      },
 
-        return;
-      }
+      [
+        boardLayout,
+        pieceSize,
+        size,
+      ]
+    );
 
-      const finished = finishPiecePosition(
+
+  const finishPiecePosition =
+    useCallback(
+      (
         piece,
         x,
         y
-      );
-
-      setLoosePieces((pieces) =>
-        pieces.map((item) =>
-          item.piece === piece ? finished : item
-        )
-      );
-    },
-    [finishPiecePosition, isOverTray]
-  );
+      ) => {
+        const target =
+          getTarget(
+            piece
+          );
 
 
-  const solvedCount = loosePieces.filter(
-    (piece) => piece.locked
-  ).length;
+        if (target) {
+          const distanceX =
+            Math.abs(
+              x -
+                target.x
+            );
 
-  const isSolved = solvedCount === totalPieces;
+
+          const distanceY =
+            Math.abs(
+              y -
+                target.y
+            );
+
+
+          const snapDistance =
+            Math.max(
+              pieceSize *
+                0.65,
+
+              18
+            );
+
+
+          if (
+            distanceX <
+              snapDistance &&
+
+            distanceY <
+              snapDistance
+          ) {
+            return {
+              piece,
+
+              x:
+                target.x,
+
+              y:
+                target.y,
+
+              locked:
+                true,
+            };
+          }
+        }
+
+
+        return {
+          piece,
+          x,
+          y,
+          locked: false,
+        };
+      },
+
+      [
+        getTarget,
+        pieceSize,
+      ]
+    );
+
+
+  const startTrayDrag =
+    useCallback(
+      (
+        piece,
+        x,
+        y
+      ) => {
+        setTrayScrollEnabled(
+          false
+        );
+
+
+        setTrayDrag({
+          piece,
+          x,
+          y,
+        });
+      },
+
+      []
+    );
+
+
+  const moveTrayDrag =
+    useCallback(
+      (
+        x,
+        y
+      ) => {
+        setTrayDrag(
+          (current) => {
+            if (
+              !current
+            ) {
+              return null;
+            }
+
+
+            return {
+              ...current,
+              x,
+              y,
+            };
+          }
+        );
+      },
+
+      []
+    );
+
+
+  const endTrayDrag =
+    useCallback(
+      (
+        x,
+        y
+      ) => {
+        setTrayScrollEnabled(
+          true
+        );
+
+
+        setTrayDrag(
+          (current) => {
+            if (
+              !current
+            ) {
+              return null;
+            }
+
+
+            if (
+              isOverTray(
+                x,
+                y
+              )
+            ) {
+              return null;
+            }
+
+
+            const newPiece =
+              finishPiecePosition(
+                current.piece,
+                x,
+                y
+              );
+
+
+            setTrayPieces(
+              (pieces) =>
+                pieces.filter(
+                  (piece) =>
+                    piece !==
+                    current.piece
+                )
+            );
+
+
+            setLoosePieces(
+              (pieces) => [
+                ...pieces,
+                newPiece,
+              ]
+            );
+
+
+            return null;
+          }
+        );
+      },
+
+      [
+        finishPiecePosition,
+        isOverTray,
+      ]
+    );
+
+
+  const moveLoosePiece =
+    useCallback(
+      (
+        piece,
+        x,
+        y
+      ) => {
+        setLoosePieces(
+          (pieces) =>
+            pieces.map(
+              (item) =>
+                item.piece ===
+                piece
+                  ? {
+                      ...item,
+                      x,
+                      y,
+                    }
+                  : item
+            )
+        );
+      },
+
+      []
+    );
+
+
+  const dropLoosePiece =
+    useCallback(
+      (
+        piece,
+        x,
+        y
+      ) => {
+        if (
+          isOverTray(
+            x,
+            y
+          )
+        ) {
+          setLoosePieces(
+            (pieces) =>
+              pieces.filter(
+                (item) =>
+                  item.piece !==
+                  piece
+              )
+          );
+
+
+          setTrayPieces(
+            (pieces) =>
+              pieces.includes(
+                piece
+              )
+                ? pieces
+                : [
+                    ...pieces,
+                    piece,
+                  ]
+          );
+
+
+          return;
+        }
+
+
+        const finished =
+          finishPiecePosition(
+            piece,
+            x,
+            y
+          );
+
+
+        setLoosePieces(
+          (pieces) =>
+            pieces.map(
+              (item) =>
+                item.piece ===
+                piece
+                  ? finished
+                  : item
+            )
+        );
+      },
+
+      [
+        finishPiecePosition,
+        isOverTray,
+      ]
+    );
+
+
+  const solvedCount =
+    loosePieces.filter(
+      (piece) =>
+        piece.locked
+    ).length;
+
+
+  const isSolved =
+    solvedCount ===
+    totalPieces;
 
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <View
+      style={
+        styles.container
+      }
+    >
+      <StatusBar
+        style="light"
+      />
 
-      <Text style={styles.title}>
+
+      <Text
+        style={
+          styles.title
+        }
+      >
         Get Puzzled!
       </Text>
 
-      <Text style={styles.subtitle}>
-        {totalPieces} pieces
+
+      <Text
+        style={
+          styles.subtitle
+        }
+      >
+        {totalPieces}
+        {' pieces'}
       </Text>
+
 
       <View
         style={[
           styles.board,
+
           {
-            width: boardSize,
-            height: boardSize,
+            width:
+              boardSize,
+
+            height:
+              boardSize,
           },
         ]}
-        onLayout={(event) =>
-          setBoardLayout(event.nativeEvent.layout)
+        onLayout={
+          (event) =>
+            setBoardLayout(
+              event
+                .nativeEvent
+                .layout
+            )
         }
       />
 
+
       {isSolved && (
-        <Text style={styles.solved}>
+        <Text
+          style={
+            styles.solved
+          }
+        >
           Puzzle Complete! 🎉
         </Text>
       )}
 
-      <Text style={styles.trayLabel}>
+
+      <Text
+        style={
+          styles.trayLabel
+        }
+      >
         Drag a piece onto the puzzle area.
       </Text>
 
+
       <View
-        style={styles.trayWrapper}
-        onLayout={(event) =>
-          setTrayLayout(event.nativeEvent.layout)
+        style={
+          styles.trayWrapper
+        }
+        onLayout={
+          (event) =>
+            setTrayLayout(
+              event
+                .nativeEvent
+                .layout
+            )
         }
       >
         <ScrollView
           horizontal
-          scrollEnabled={trayScrollEnabled}
+          scrollEnabled={
+            trayScrollEnabled
+          }
           showsHorizontalScrollIndicator
           persistentScrollbar
-          contentContainerStyle={styles.trayContent}
+          contentContainerStyle={
+            styles.trayContent
+          }
         >
-          {trayPieces.map((piece) => (
-            <TrayPiece
-              key={piece}
-              piece={piece}
-              image={image}
-              size={size}
-              boardSize={boardSize}
-              trayPieceSize={trayPieceSize}
-              pieceSize={pieceSize}
-              onDragStart={startTrayDrag}
-              onDragMove={moveTrayDrag}
-              onDragEnd={endTrayDrag}
-            />
-          ))}
+          {trayPieces.map(
+            (piece) => (
+              <TrayPiece
+                key={
+                  piece
+                }
+
+                piece={
+                  piece
+                }
+
+                image={
+                  image
+                }
+
+                size={
+                  size
+                }
+
+                trayPieceSize={
+                  trayPieceSize
+                }
+
+                pieceSize={
+                  pieceSize
+                }
+
+                onDragStart={
+                  startTrayDrag
+                }
+
+                onDragMove={
+                  moveTrayDrag
+                }
+
+                onDragEnd={
+                  endTrayDrag
+                }
+              />
+            )
+          )}
         </ScrollView>
       </View>
 
+
       <Pressable
-        style={styles.backButton}
-        onPress={() => setScreen('menu')}
+        style={
+          styles.backButton
+        }
+        onPress={
+          () =>
+            setScreen(
+              'menu'
+            )
+        }
       >
-        <Text style={styles.backText}>
+        <Text
+          style={
+            styles.backText
+          }
+        >
           Back
         </Text>
       </Pressable>
 
+
       <View
         pointerEvents="box-none"
-        style={StyleSheet.absoluteFill}
+        style={
+          StyleSheet.absoluteFill
+        }
       >
-        {loosePieces.map((item) => (
-          <LoosePiece
-            key={item.piece}
-            item={item}
-            image={image}
-            size={size}
-            boardSize={boardSize}
-            pieceSize={pieceSize}
-            onMove={moveLoosePiece}
-            onDrop={dropLoosePiece}
-          />
-        ))}
+        {loosePieces.map(
+          (item) => (
+            <LoosePiece
+              key={
+                item.piece
+              }
+
+              item={
+                item
+              }
+
+              image={
+                image
+              }
+
+              size={
+                size
+              }
+
+              pieceSize={
+                pieceSize
+              }
+
+              onMove={
+                moveLoosePiece
+              }
+
+              onDrop={
+                dropLoosePiece
+              }
+            />
+          )
+        )}
+
 
         {trayDrag && (
           <View
             pointerEvents="none"
             style={[
               styles.floatingPiece,
+
               {
-                left: trayDrag.x,
-                top: trayDrag.y,
-                width: pieceSize,
-                height: pieceSize,
+                left:
+                  trayDrag.x -
+                  piecePadding,
+
+                top:
+                  trayDrag.y -
+                  piecePadding,
+
+                width:
+                  visualPieceSize,
+
+                height:
+                  visualPieceSize,
               },
             ]}
           >
             <PieceImage
-              piece={trayDrag.piece}
-              image={image}
-              size={size}
-              boardSize={boardSize}
-              displaySize={pieceSize}
+              piece={
+                trayDrag.piece
+              }
+
+              image={
+                image
+              }
+
+              size={
+                size
+              }
+
+              displaySize={
+                pieceSize
+              }
             />
           </View>
         )}
@@ -590,82 +1110,146 @@ export default function PuzzleScreen({
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-    backgroundColor: '#17111f',
-    alignItems: 'center',
-    paddingTop: 55,
-    paddingHorizontal: 16,
-  },
+const styles =
+  StyleSheet.create({
+    container: {
+      flex: 1,
 
-  title: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
+      position:
+        'relative',
 
-  subtitle: {
-    color: '#cfc5dc',
-    fontSize: 16,
-    marginTop: 4,
-    marginBottom: 18,
-  },
+      backgroundColor:
+        '#17111f',
 
-  board: {
-    backgroundColor: '#1d1626',
-  },
+      alignItems:
+        'center',
 
-  solved: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 12,
-  },
+      paddingTop: 55,
 
-  trayLabel: {
-    color: '#cfc5dc',
-    fontSize: 15,
-    marginTop: 18,
-    marginBottom: 8,
-  },
+      paddingHorizontal:
+        16,
+    },
 
-  trayWrapper: {
-    width: '100%',
-    height: 92,
-  },
 
-  trayContent: {
-    alignItems: 'center',
-    paddingHorizontal: 6,
-    paddingBottom: 12,
-  },
+    title: {
+      color:
+        'white',
 
-  trayPiece: {
-    marginRight: 8,
-    overflow: 'hidden',
-    borderRadius: 6,
-  },
+      fontSize:
+        30,
 
-  loosePiece: {
-    position: 'absolute',
-    overflow: 'hidden',
-  },
+      fontWeight:
+        'bold',
+    },
 
-  floatingPiece: {
-    position: 'absolute',
-    overflow: 'hidden',
-    zIndex: 1000,
-  },
 
-  backButton: {
-    marginTop: 14,
-    padding: 10,
-  },
+    subtitle: {
+      color:
+        '#cfc5dc',
 
-  backText: {
-    color: '#cfc5dc',
-    fontSize: 17,
-  },
-});
+      fontSize:
+        16,
+
+      marginTop:
+        4,
+
+      marginBottom:
+        18,
+    },
+
+
+    board: {
+      backgroundColor:
+        '#1d1626',
+    },
+
+
+    solved: {
+      color:
+        'white',
+
+      fontSize:
+        22,
+
+      fontWeight:
+        'bold',
+
+      marginTop:
+        12,
+    },
+
+
+    trayLabel: {
+      color:
+        '#cfc5dc',
+
+      fontSize:
+        15,
+
+      marginTop:
+        18,
+
+      marginBottom:
+        8,
+    },
+
+
+    trayWrapper: {
+      width:
+        '100%',
+
+      height:
+        112,
+    },
+
+
+    trayContent: {
+      alignItems:
+        'center',
+
+      paddingHorizontal:
+        6,
+
+      paddingBottom:
+        12,
+    },
+
+
+    trayPiece: {
+      marginRight:
+        4,
+    },
+
+
+    loosePiece: {
+      position:
+        'absolute',
+    },
+
+
+    floatingPiece: {
+      position:
+        'absolute',
+
+      zIndex:
+        1000,
+    },
+
+
+    backButton: {
+      marginTop:
+        14,
+
+      padding:
+        10,
+    },
+
+
+    backText: {
+      color:
+        '#cfc5dc',
+
+      fontSize:
+        17,
+    },
+  });
