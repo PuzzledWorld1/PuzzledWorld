@@ -15,6 +15,7 @@ export default function MenuScreen({
   setScreen,
   image,
   setImage,
+  setImageOrientation,
   setDifficulty,
 }) {
   const difficulties = [
@@ -79,12 +80,30 @@ export default function MenuScreen({
           allowsEditing: false,
 
           quality: 1,
+
+          // Camera photos often carry an EXIF rotation tag rather than
+          // physically-rotated pixels - the crop screen needs the real
+          // tag value (not just a "looks right" preview) to bake the
+          // correct orientation into the file before doing any crop math.
+          exif: true,
         });
 
 
     if (!result.canceled) {
+      const asset =
+        result.assets[0];
+
+      const orientation =
+        asset.exif?.Orientation ??
+        asset.exif?.orientation ??
+        1;
+
       setImage(
-        result.assets[0].uri
+        asset.uri
+      );
+
+      setImageOrientation(
+        orientation
       );
 
       setScreen('crop');

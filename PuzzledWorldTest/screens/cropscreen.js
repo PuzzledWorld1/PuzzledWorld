@@ -1,12 +1,16 @@
 import {
   Image,
-  PanResponder,
   Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
+
+import {
+  Gesture,
+  GestureDetector,
+} from 'react-native-gesture-handler';
 
 import {
   ImageManipulator,
@@ -32,8 +36,22 @@ function clamp(value, min, max) {
 }
 
 
+// Standard EXIF orientation tags -> the clockwise rotation (in degrees)
+// needed to make the raw pixel buffer match what every viewer already
+// displays for that tag. Only covers the plain-rotation tags (1/3/6/8);
+// the mirrored tags (2/4/5/7) are rare for phone camera photos and are
+// treated as "no rotation" here rather than left unhandled.
+const EXIF_ROTATION = {
+  1: 0,
+  3: 180,
+  6: 90,
+  8: 270,
+};
+
+
 export default function CropScreen({
   image,
+  imageOrientation,
   setImage,
   setScreen,
 }) {
@@ -50,6 +68,9 @@ export default function CropScreen({
     520
   );
 
+
+  const [normalizedImage, setNormalizedImage] =
+    useState(null);
 
   const [originalSize, setOriginalSize] =
     useState(null);
@@ -78,14 +99,100 @@ export default function CropScreen({
   imageDisplayRef.current = imageDisplay;
 
 
+  // expo-image-manipulator's crop() works in raw pixel space and does not
+  // reliably agree with the EXIF rotation tag that RN's <Image> (and every
+  // other normal viewer) uses to display the photo right-side up. Left as
+  // -is, the box the user drags has nothing to do with the coordinates the
+  // manipulator crops from, so the result can land in a completely
+  // different part of the photo. Baking the actual EXIF-indicated rotation
+  // into the pixels once, up front, removes that ambiguity for every
+  // measurement taken after this point. processedForRef guards against
+  // this firing twice for the same image (e.g. React's dev-mode double
+  // effect invocation) kicking off two concurrent native manipulate calls.
+  const processedForRef = useRef(null);
+
   useEffect(() => {
     if (!image) return;
 
+    if (processedForRef.current === image) return;
 
-    Image.getSize(
-      image,
+    processedForRef.current = image;
 
-      (width, height) => {
+
+    const rotation =
+      EXIF_ROTATION[imageOrientation] ?? 0;
+
+
+    if (rotation === 0) {
+      setNormalizedImage(image);
+      return;
+    }
+
+
+    let cancelled = false;
+
+
+    ImageManipulator.manipulate(image)
+      .rotate(rotation)
+      .renderAsync()
+      .then((rendered) =>
+        rendered.saveAsync({
+          format: SaveFormat.JPEG,
+          compress: 1,
+        })
+      )
+      .then((result) => {
+        if (!cancelled) {
+          setNormalizedImage(result.uri);
+        }
+      })
+      .catch((error) => {
+        console.log(
+          'Could not normalize image orientation:',
+          error
+        );
+
+
+        if (!cancelled) {
+          setNormalizedImage(image);
+        }
+      });
+
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    image,
+    imageOrientation,
+  ]);
+
+
+  // Measure the photo through ImageManipulator itself rather than RN's
+  // Image.getSize - they're different native code paths and aren't
+  // guaranteed to agree on the photo's true pixel resolution (e.g. one
+  // reading a cached/thumbnail size while the other processes the full
+  // file). Since crop() is issued through ImageManipulator too, measuring
+  // through the same library guarantees the scale math and the actual
+  // crop agree on what "the image" is.
+  useEffect(() => {
+    if (!normalizedImage) return;
+
+
+    let cancelled = false;
+
+
+    ImageManipulator.manipulate(normalizedImage)
+      .renderAsync()
+      .then((rendered) => {
+        if (cancelled) return;
+
+
+        const width = rendered.width;
+
+        const height = rendered.height;
+
+
         setOriginalSize({
           width,
           height,
@@ -152,17 +259,20 @@ export default function CropScreen({
           y: startingY,
           size: startingSize,
         });
-      },
-
-      (error) => {
+      })
+      .catch((error) => {
         console.log(
           'Could not read image size:',
           error
         );
-      }
-    );
+      });
+
+
+    return () => {
+      cancelled = true;
+    };
   }, [
-    image,
+    normalizedImage,
     stageHeight,
     stageWidth,
   ]);
@@ -484,33 +594,28 @@ export default function CropScreen({
   };
 
 
-  const stageResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () =>
-        true,
-
-      onMoveShouldSetPanResponder: () =>
-        true,
-
-
-      onPanResponderGrant: (event) => {
+  // Plain PanResponder gestures elsewhere in the app can misbehave once
+  // react-native-gesture-handler's GestureHandlerRootView wraps the app
+  // (added for the puzzle-piece drag), since RNGH takes over touch
+  // dispatch at the root. Using a gesture-handler Pan here instead keeps
+  // this screen's touch handling consistent with the rest of the app.
+  // runOnJS(true) keeps every callback on the JS thread (like the old
+  // PanResponder handlers), since they call React state setters directly.
+  const stagePan =
+    Gesture.Pan()
+      .runOnJS(true)
+      .minDistance(0)
+      .onBegin((event) => {
         const currentCrop =
           cropRef.current;
 
         if (!currentCrop) return;
 
 
-        const touchX =
-          event.nativeEvent.locationX;
-
-        const touchY =
-          event.nativeEvent.locationY;
-
-
         gestureMode.current =
           findGestureMode(
-            touchX,
-            touchY,
+            event.x,
+            event.y,
             currentCrop
           );
 
@@ -518,10 +623,8 @@ export default function CropScreen({
         gestureStart.current = {
           ...currentCrop,
         };
-      },
-
-
-      onPanResponderMove: (_, gesture) => {
+      })
+      .onUpdate((event) => {
         const mode =
           gestureMode.current;
 
@@ -563,13 +666,13 @@ export default function CropScreen({
             ...start,
 
             x: clamp(
-              start.x + gesture.dx,
+              start.x + event.translationX,
               minX,
               maxX
             ),
 
             y: clamp(
-              start.y + gesture.dy,
+              start.y + event.translationY,
               minY,
               maxY
             ),
@@ -582,26 +685,15 @@ export default function CropScreen({
         resizeCrop(
           mode,
           start,
-          gesture.dx,
-          gesture.dy
+          event.translationX,
+          event.translationY
         );
-      },
-
-
-      onPanResponderRelease: () => {
+      })
+      .onFinalize(() => {
         gestureMode.current = null;
 
         gestureStart.current = null;
-      },
-
-
-      onPanResponderTerminate: () => {
-        gestureMode.current = null;
-
-        gestureStart.current = null;
-      },
-    })
-  ).current;
+      });
 
 
   const useCrop = async () => {
@@ -655,7 +747,7 @@ export default function CropScreen({
 
 
       const context =
-        ImageManipulator.manipulate(image);
+        ImageManipulator.manipulate(normalizedImage);
 
 
       context.crop({
@@ -697,7 +789,7 @@ export default function CropScreen({
 
 
   if (
-    !image ||
+    !normalizedImage ||
     !imageDisplay ||
     !crop
   ) {
@@ -726,110 +818,111 @@ export default function CropScreen({
       </Text>
 
 
-      <View
-        {...stageResponder.panHandlers}
-        style={[
-          styles.stage,
-          {
-            width: stageWidth,
-            height: stageHeight,
-          },
-        ]}
-      >
-        <Image
-          pointerEvents="none"
-          source={{ uri: image }}
-          resizeMode="contain"
-          style={[
-            styles.image,
-            {
-              left: imageDisplay.x,
-              top: imageDisplay.y,
-              width: imageDisplay.width,
-              height: imageDisplay.height,
-            },
-          ]}
-        />
-
-
+      <GestureDetector gesture={stagePan}>
         <View
-          pointerEvents="none"
           style={[
-            styles.cropBox,
+            styles.stage,
             {
-              left: crop.x,
-              top: crop.y,
-              width: crop.size,
-              height: crop.size,
+              width: stageWidth,
+              height: stageHeight,
             },
           ]}
         >
-          <View style={styles.gridVerticalOne} />
-
-          <View style={styles.gridVerticalTwo} />
-
-          <View style={styles.gridHorizontalOne} />
-
-          <View style={styles.gridHorizontalTwo} />
-
-
-          <View
+          <Image
+            pointerEvents="none"
+            source={{ uri: normalizedImage }}
+            resizeMode="contain"
             style={[
-              styles.handle,
-              styles.nw,
+              styles.image,
+              {
+                left: imageDisplay.x,
+                top: imageDisplay.y,
+                width: imageDisplay.width,
+                height: imageDisplay.height,
+              },
             ]}
           />
 
-          <View
-            style={[
-              styles.handle,
-              styles.n,
-            ]}
-          />
 
           <View
+            pointerEvents="none"
             style={[
-              styles.handle,
-              styles.ne,
+              styles.cropBox,
+              {
+                left: crop.x,
+                top: crop.y,
+                width: crop.size,
+                height: crop.size,
+              },
             ]}
-          />
+          >
+            <View style={styles.gridVerticalOne} />
 
-          <View
-            style={[
-              styles.handle,
-              styles.e,
-            ]}
-          />
+            <View style={styles.gridVerticalTwo} />
 
-          <View
-            style={[
-              styles.handle,
-              styles.se,
-            ]}
-          />
+            <View style={styles.gridHorizontalOne} />
 
-          <View
-            style={[
-              styles.handle,
-              styles.s,
-            ]}
-          />
+            <View style={styles.gridHorizontalTwo} />
 
-          <View
-            style={[
-              styles.handle,
-              styles.sw,
-            ]}
-          />
 
-          <View
-            style={[
-              styles.handle,
-              styles.w,
-            ]}
-          />
+            <View
+              style={[
+                styles.handle,
+                styles.nw,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.n,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.ne,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.e,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.se,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.s,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.sw,
+              ]}
+            />
+
+            <View
+              style={[
+                styles.handle,
+                styles.w,
+              ]}
+            />
+          </View>
         </View>
-      </View>
+      </GestureDetector>
 
 
       <Pressable

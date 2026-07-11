@@ -1,12 +1,10 @@
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
 import {
-  PanResponder,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,6 +12,18 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+
+import {
+  Gesture,
+  GestureDetector,
+} from 'react-native-gesture-handler';
+
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import {
   StatusBar,
@@ -48,124 +58,121 @@ function TrayPiece({
   size,
   trayPieceSize,
   pieceSize,
+  floatX,
+  floatY,
   onDragStart,
-  onDragMove,
   onDragEnd,
 }) {
-  const lastPosition =
-    useRef({
-      x: 0,
-      y: 0,
-    });
-
-
   const trayVisualSize =
     trayPieceSize *
     PIECE_BOX_SCALE;
 
 
-  const panResponder =
-    useRef(
-      PanResponder.create({
-        onStartShouldSetPanResponder:
-          () => false,
+  // activeOffsetY/failOffsetX let the tray's horizontal ScrollView keep
+  // handling horizontal swipes - this gesture only takes over once the
+  // finger has moved vertically past the threshold, mirroring the old
+  // PanResponder's "vertical > horizontal" check.
+  const pan =
+    Gesture.Pan()
+      .activeOffsetY([-8, 8])
+      .failOffsetX([-10, 10])
+      .onStart((event) => {
+        floatX.value =
+          event.absoluteX -
+          pieceSize / 2;
 
+        floatY.value =
+          event.absoluteY -
+          pieceSize / 2;
 
-        onMoveShouldSetPanResponder:
-          (_, gesture) => {
-            const vertical =
-              Math.abs(
-                gesture.dy
-              );
-
-            const horizontal =
-              Math.abs(
-                gesture.dx
-              );
-
-            return (
-              vertical > 8 &&
-              vertical > horizontal
-            );
-          },
-
-
-        onPanResponderGrant:
-          (_, gesture) => {
-            const x =
-              gesture.moveX -
-              pieceSize / 2;
-
-            const y =
-              gesture.moveY -
-              pieceSize / 2;
-
-            lastPosition.current = {
-              x,
-              y,
-            };
-
-            onDragStart(
-              piece,
-              x,
-              y
-            );
-          },
-
-
-        onPanResponderMove:
-          (_, gesture) => {
-            const x =
-              gesture.moveX -
-              pieceSize / 2;
-
-            const y =
-              gesture.moveY -
-              pieceSize / 2;
-
-            lastPosition.current = {
-              x,
-              y,
-            };
-
-            onDragMove(
-              x,
-              y
-            );
-          },
-
-
-        onPanResponderRelease:
-          () => {
-            onDragEnd(
-              lastPosition.current.x,
-              lastPosition.current.y
-            );
-          },
-
-
-        onPanResponderTerminate:
-          () => {
-            onDragEnd(
-              lastPosition.current.x,
-              lastPosition.current.y
-            );
-          },
+        runOnJS(onDragStart)(
+          piece
+        );
       })
-    ).current;
+      .onUpdate((event) => {
+        floatX.value =
+          event.absoluteX -
+          pieceSize / 2;
+
+        floatY.value =
+          event.absoluteY -
+          pieceSize / 2;
+      })
+      .onEnd((event) => {
+        runOnJS(onDragEnd)(
+          piece,
+          event.absoluteX -
+            pieceSize / 2,
+          event.absoluteY -
+            pieceSize / 2
+        );
+      });
 
 
   return (
-    <View
-      {...panResponder.panHandlers}
+    <GestureDetector gesture={pan}>
+      <View
+        style={[
+          styles.trayPiece,
+          {
+            width:
+              trayVisualSize,
+
+            height:
+              trayVisualSize,
+          },
+        ]}
+      >
+        <PieceImage
+          piece={piece}
+          image={image}
+          size={size}
+          displaySize={
+            trayPieceSize
+          }
+        />
+      </View>
+    </GestureDetector>
+  );
+}
+
+
+function FloatingPiece({
+  piece,
+  image,
+  size,
+  pieceSize,
+  visualPieceSize,
+  piecePadding,
+  floatX,
+  floatY,
+}) {
+  const animatedStyle =
+    useAnimatedStyle(
+      () => ({
+        left:
+          floatX.value -
+          piecePadding,
+
+        top:
+          floatY.value -
+          piecePadding,
+      })
+    );
+
+
+  return (
+    <Animated.View
+      pointerEvents="none"
       style={[
-        styles.trayPiece,
+        styles.floatingPiece,
+        animatedStyle,
         {
           width:
-            trayVisualSize,
+            visualPieceSize,
 
           height:
-            trayVisualSize,
+            visualPieceSize,
         },
       ]}
     >
@@ -174,10 +181,10 @@ function TrayPiece({
         image={image}
         size={size}
         displaySize={
-          trayPieceSize
+          pieceSize
         }
       />
-    </View>
+    </Animated.View>
   );
 }
 
@@ -187,30 +194,8 @@ function LoosePiece({
   image,
   size,
   pieceSize,
-  onMove,
   onDrop,
 }) {
-  const itemRef =
-    useRef(item);
-
-
-  const startPosition =
-    useRef({
-      x: item.x,
-      y: item.y,
-    });
-
-
-  const lastPosition =
-    useRef({
-      x: item.x,
-      y: item.y,
-    });
-
-
-  itemRef.current = item;
-
-
   const piecePadding =
     pieceSize *
     PIECE_PADDING_RATIO;
@@ -221,139 +206,118 @@ function LoosePiece({
     PIECE_BOX_SCALE;
 
 
-  const panResponder =
-    useRef(
-      PanResponder.create({
-        onStartShouldSetPanResponder:
-          () =>
-            !itemRef.current.locked,
+  // Position lives in shared values so dragging updates the UI thread
+  // directly, without a React re-render (and re-render of every other
+  // piece) on every touch-move frame. React state (`item`) stays the
+  // source of truth between drags and for game logic (locked/snap).
+  const translateX =
+    useSharedValue(item.x);
+
+  const translateY =
+    useSharedValue(item.y);
+
+  const startX =
+    useSharedValue(item.x);
+
+  const startY =
+    useSharedValue(item.y);
 
 
-        onMoveShouldSetPanResponder:
-          () =>
-            !itemRef.current.locked,
+  useEffect(() => {
+    if (item.locked) {
+      translateX.value =
+        withTiming(item.x, {
+          duration: 150,
+        });
+
+      translateY.value =
+        withTiming(item.y, {
+          duration: 150,
+        });
+    } else {
+      translateX.value =
+        item.x;
+
+      translateY.value =
+        item.y;
+    }
+  }, [
+    item.x,
+    item.y,
+    item.locked,
+  ]);
 
 
-        onPanResponderGrant:
-          () => {
-            const currentItem =
-              itemRef.current;
+  const pan =
+    Gesture.Pan()
+      .enabled(!item.locked)
+      .onStart(() => {
+        startX.value =
+          translateX.value;
 
-            startPosition.current = {
-              x: currentItem.x,
-              y: currentItem.y,
-            };
-
-            lastPosition.current = {
-              x: currentItem.x,
-              y: currentItem.y,
-            };
-          },
-
-
-        onPanResponderMove:
-          (_, gesture) => {
-            if (
-              itemRef.current.locked
-            ) {
-              return;
-            }
-
-
-            const x =
-              startPosition.current.x +
-              gesture.dx;
-
-
-            const y =
-              startPosition.current.y +
-              gesture.dy;
-
-
-            lastPosition.current = {
-              x,
-              y,
-            };
-
-
-            onMove(
-              itemRef.current.piece,
-              x,
-              y
-            );
-          },
-
-
-        onPanResponderRelease:
-          () => {
-            if (
-              itemRef.current.locked
-            ) {
-              return;
-            }
-
-
-            onDrop(
-              itemRef.current.piece,
-              lastPosition.current.x,
-              lastPosition.current.y
-            );
-          },
-
-
-        onPanResponderTerminate:
-          () => {
-            if (
-              itemRef.current.locked
-            ) {
-              return;
-            }
-
-
-            onDrop(
-              itemRef.current.piece,
-              lastPosition.current.x,
-              lastPosition.current.y
-            );
-          },
+        startY.value =
+          translateY.value;
       })
-    ).current;
+      .onUpdate((event) => {
+        translateX.value =
+          startX.value +
+          event.translationX;
+
+        translateY.value =
+          startY.value +
+          event.translationY;
+      })
+      .onEnd(() => {
+        runOnJS(onDrop)(
+          item.piece,
+          translateX.value,
+          translateY.value
+        );
+      });
+
+
+  const animatedStyle =
+    useAnimatedStyle(
+      () => ({
+        left:
+          translateX.value -
+          piecePadding,
+
+        top:
+          translateY.value -
+          piecePadding,
+      })
+    );
 
 
   return (
-    <View
-      {...panResponder.panHandlers}
-      style={[
-        styles.loosePiece,
-        {
-          left:
-            item.x -
-            piecePadding,
+    <GestureDetector gesture={pan}>
+      <Animated.View
+        style={[
+          styles.loosePiece,
+          animatedStyle,
+          {
+            width:
+              visualSize,
 
-          top:
-            item.y -
-            piecePadding,
+            height:
+              visualSize,
 
-          width:
-            visualSize,
-
-          height:
-            visualSize,
-
-          zIndex:
-            item.locked
-              ? 10
-              : 100,
-        },
-      ]}
-    >
-      <PieceImage
-        piece={item.piece}
-        image={image}
-        size={size}
-        displaySize={pieceSize}
-      />
-    </View>
+            zIndex:
+              item.locked
+                ? 10
+                : 100,
+          },
+        ]}
+      >
+        <PieceImage
+          piece={item.piece}
+          image={image}
+          size={size}
+          displaySize={pieceSize}
+        />
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
@@ -431,10 +395,17 @@ export default function PuzzleScreen({
 
 
   const [
-    trayDrag,
-    setTrayDrag,
+    trayDragPiece,
+    setTrayDragPiece,
   ] =
     useState(null);
+
+
+  const floatX =
+    useSharedValue(0);
+
+  const floatY =
+    useSharedValue(0);
 
 
   const [
@@ -475,7 +446,7 @@ export default function PuzzleScreen({
     );
 
 
-    setTrayDrag(
+    setTrayDragPiece(
       null
     );
   }, [
@@ -635,48 +606,13 @@ export default function PuzzleScreen({
 
   const startTrayDrag =
     useCallback(
-      (
-        piece,
-        x,
-        y
-      ) => {
+      (piece) => {
         setTrayScrollEnabled(
           false
         );
 
-
-        setTrayDrag({
-          piece,
-          x,
-          y,
-        });
-      },
-
-      []
-    );
-
-
-  const moveTrayDrag =
-    useCallback(
-      (
-        x,
-        y
-      ) => {
-        setTrayDrag(
-          (current) => {
-            if (
-              !current
-            ) {
-              return null;
-            }
-
-
-            return {
-              ...current,
-              x,
-              y,
-            };
-          }
+        setTrayDragPiece(
+          piece
         );
       },
 
@@ -687,6 +623,7 @@ export default function PuzzleScreen({
   const endTrayDrag =
     useCallback(
       (
+        piece,
         x,
         y
       ) => {
@@ -694,54 +631,44 @@ export default function PuzzleScreen({
           true
         );
 
-
-        setTrayDrag(
-          (current) => {
-            if (
-              !current
-            ) {
-              return null;
-            }
+        setTrayDragPiece(
+          null
+        );
 
 
-            if (
-              isOverTray(
-                x,
-                y
-              )
-            ) {
-              return null;
-            }
+        if (
+          isOverTray(
+            x,
+            y
+          )
+        ) {
+          return;
+        }
 
 
-            const newPiece =
-              finishPiecePosition(
-                current.piece,
-                x,
-                y
-              );
+        const newPiece =
+          finishPiecePosition(
+            piece,
+            x,
+            y
+          );
 
 
-            setTrayPieces(
-              (pieces) =>
-                pieces.filter(
-                  (piece) =>
-                    piece !==
-                    current.piece
-                )
-            );
+        setTrayPieces(
+          (pieces) =>
+            pieces.filter(
+              (item) =>
+                item !==
+                piece
+            )
+        );
 
 
-            setLoosePieces(
-              (pieces) => [
-                ...pieces,
-                newPiece,
-              ]
-            );
-
-
-            return null;
-          }
+        setLoosePieces(
+          (pieces) => [
+            ...pieces,
+            newPiece,
+          ]
         );
       },
 
@@ -749,33 +676,6 @@ export default function PuzzleScreen({
         finishPiecePosition,
         isOverTray,
       ]
-    );
-
-
-  const moveLoosePiece =
-    useCallback(
-      (
-        piece,
-        x,
-        y
-      ) => {
-        setLoosePieces(
-          (pieces) =>
-            pieces.map(
-              (item) =>
-                item.piece ===
-                piece
-                  ? {
-                      ...item,
-                      x,
-                      y,
-                    }
-                  : item
-            )
-        );
-      },
-
-      []
     );
 
 
@@ -982,12 +882,16 @@ export default function PuzzleScreen({
                   pieceSize
                 }
 
-                onDragStart={
-                  startTrayDrag
+                floatX={
+                  floatX
                 }
 
-                onDragMove={
-                  moveTrayDrag
+                floatY={
+                  floatY
+                }
+
+                onDragStart={
+                  startTrayDrag
                 }
 
                 onDragEnd={
@@ -1050,10 +954,6 @@ export default function PuzzleScreen({
                 pieceSize
               }
 
-              onMove={
-                moveLoosePiece
-              }
-
               onDrop={
                 dropLoosePiece
               }
@@ -1062,47 +962,40 @@ export default function PuzzleScreen({
         )}
 
 
-        {trayDrag && (
-          <View
-            pointerEvents="none"
-            style={[
-              styles.floatingPiece,
+        {trayDragPiece !== null && (
+          <FloatingPiece
+            piece={
+              trayDragPiece
+            }
 
-              {
-                left:
-                  trayDrag.x -
-                  piecePadding,
+            image={
+              image
+            }
 
-                top:
-                  trayDrag.y -
-                  piecePadding,
+            size={
+              size
+            }
 
-                width:
-                  visualPieceSize,
+            pieceSize={
+              pieceSize
+            }
 
-                height:
-                  visualPieceSize,
-              },
-            ]}
-          >
-            <PieceImage
-              piece={
-                trayDrag.piece
-              }
+            visualPieceSize={
+              visualPieceSize
+            }
 
-              image={
-                image
-              }
+            piecePadding={
+              piecePadding
+            }
 
-              size={
-                size
-              }
+            floatX={
+              floatX
+            }
 
-              displaySize={
-                pieceSize
-              }
-            />
-          </View>
+            floatY={
+              floatY
+            }
+          />
         )}
       </View>
     </View>
