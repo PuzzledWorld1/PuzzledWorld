@@ -500,7 +500,7 @@ export default function PuzzleScreen({
   const boardSize =
     Math.min(
       windowWidth - 32,
-      350
+      400
     );
 
 
@@ -519,7 +519,7 @@ export default function PuzzleScreen({
 
 
   const trayPieceSize =
-    70;
+    56;
 
 
   const totalPieces =
@@ -1690,7 +1690,7 @@ const styles =
         4,
 
       marginBottom:
-        18,
+        50,
     },
 
 
@@ -1723,7 +1723,7 @@ const styles =
         15,
 
       marginTop:
-        18,
+        60,
 
       marginBottom:
         8,
@@ -1735,7 +1735,7 @@ const styles =
         '100%',
 
       height:
-        112,
+        92,
     },
 
 
