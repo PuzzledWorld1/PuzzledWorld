@@ -1,6 +1,8 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -22,7 +24,6 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
 } from 'react-native-reanimated';
 
 import {
@@ -33,6 +34,138 @@ import JigsawPiece, {
   PIECE_BOX_SCALE,
   PIECE_PADDING_RATIO,
 } from '../components/JigsawPiece';
+
+import {
+  saveInProgressPuzzle,
+  saveCompletedPuzzle,
+  clearInProgressPuzzle,
+} from '../lib/puzzleData';
+
+import { uploadInProgressImage } from '../lib/puzzleImage';
+
+
+// The four grid neighbors of a piece, each tagged with the row/col step
+// (dRow, dCol) that separates them - used to compute where a matching
+// neighbor's top-left corner MUST sit relative to this piece.
+function neighborsOf(piece, size) {
+  const row = Math.floor(piece / size);
+  const col = piece % size;
+  const list = [];
+
+  if (row > 0) {
+    list.push({ id: piece - size, dRow: -1, dCol: 0 });
+  }
+
+  if (row < size - 1) {
+    list.push({ id: piece + size, dRow: 1, dCol: 0 });
+  }
+
+  if (col > 0) {
+    list.push({ id: piece - 1, dRow: 0, dCol: -1 });
+  }
+
+  if (col < size - 1) {
+    list.push({ id: piece + 1, dRow: 0, dCol: 1 });
+  }
+
+  return list;
+}
+
+
+// Decides where a piece (or a rigid group of already-connected pieces)
+// ends up after being dragged: snapped onto its correct board slot,
+// snapped onto a matching neighbor piece/group (wherever that neighbor
+// currently sits), or left wherever it was dropped.
+//
+// `others` is every OTHER loose piece currently on screen (their group
+// may be locked to the board or just another free-floating cluster) -
+// matching against them is what lets two clusters merge into one without
+// either being anywhere near its final board position.
+function resolvePlacement({
+  memberIds,
+  positions,
+  others,
+  size,
+  pieceSize,
+  getTarget,
+}) {
+  const snapDistance = Math.max(pieceSize * 0.65, 18);
+
+  for (const id of memberIds) {
+    const target = getTarget(id);
+    const pos = positions[id];
+
+    if (
+      target &&
+      Math.abs(pos.x - target.x) < snapDistance &&
+      Math.abs(pos.y - target.y) < snapDistance
+    ) {
+      const dx = target.x - pos.x;
+      const dy = target.y - pos.y;
+
+      const finalPositions = {};
+      memberIds.forEach((memberId) => {
+        finalPositions[memberId] = {
+          x: positions[memberId].x + dx,
+          y: positions[memberId].y + dy,
+        };
+      });
+
+      return {
+        positions: finalPositions,
+        locked: true,
+        mergeWithGroupId: null,
+      };
+    }
+  }
+
+  for (const id of memberIds) {
+    for (const { id: neighborId, dRow, dCol } of neighborsOf(id, size)) {
+      const neighbor = others.find((o) => o.piece === neighborId);
+
+      if (!neighbor) {
+        continue;
+      }
+
+      const pos = positions[id];
+      const expectedX = pos.x + dCol * pieceSize;
+      const expectedY = pos.y + dRow * pieceSize;
+
+      if (
+        Math.abs(neighbor.x - expectedX) < snapDistance &&
+        Math.abs(neighbor.y - expectedY) < snapDistance
+      ) {
+        const dx = neighbor.x - expectedX;
+        const dy = neighbor.y - expectedY;
+
+        const finalPositions = {};
+        memberIds.forEach((memberId) => {
+          finalPositions[memberId] = {
+            x: positions[memberId].x + dx,
+            y: positions[memberId].y + dy,
+          };
+        });
+
+        return {
+          positions: finalPositions,
+          locked: neighbor.locked,
+          mergeWithGroupId: neighbor.groupId,
+        };
+      }
+    }
+  }
+
+  const finalPositions = {};
+  memberIds.forEach((memberId) => {
+    finalPositions[memberId] = positions[memberId];
+  });
+
+  return {
+    positions: finalPositions,
+    locked: false,
+    mergeWithGroupId: null,
+  };
+}
 
 
 function PieceImage({
@@ -189,89 +322,56 @@ function FloatingPiece({
 }
 
 
-function LoosePiece({
-  item,
+// One piece within a connected cluster. All members of a cluster share
+// the SAME groupX/groupY drag deltas (passed down from PieceGroup), so
+// dragging any single piece drags the whole cluster together - each
+// member still gets its own GestureDetector (sized to just that piece)
+// so touch hit-testing works normally, but the drag they all perform is
+// identical.
+function GroupMemberPiece({
+  member,
   image,
   size,
   pieceSize,
+  piecePadding,
+  visualPieceSize,
+  groupX,
+  groupY,
+  enabled,
+  groupId,
   onDrop,
 }) {
-  const piecePadding =
-    pieceSize *
-    PIECE_PADDING_RATIO;
-
-
-  const visualSize =
-    pieceSize *
-    PIECE_BOX_SCALE;
-
-
-  // Position lives in shared values so dragging updates the UI thread
-  // directly, without a React re-render (and re-render of every other
-  // piece) on every touch-move frame. React state (`item`) stays the
-  // source of truth between drags and for game logic (locked/snap).
-  const translateX =
-    useSharedValue(item.x);
-
-  const translateY =
-    useSharedValue(item.y);
-
   const startX =
-    useSharedValue(item.x);
+    useSharedValue(0);
 
   const startY =
-    useSharedValue(item.y);
-
-
-  useEffect(() => {
-    if (item.locked) {
-      translateX.value =
-        withTiming(item.x, {
-          duration: 150,
-        });
-
-      translateY.value =
-        withTiming(item.y, {
-          duration: 150,
-        });
-    } else {
-      translateX.value =
-        item.x;
-
-      translateY.value =
-        item.y;
-    }
-  }, [
-    item.x,
-    item.y,
-    item.locked,
-  ]);
+    useSharedValue(0);
 
 
   const pan =
     Gesture.Pan()
-      .enabled(!item.locked)
+      .enabled(enabled)
       .onStart(() => {
         startX.value =
-          translateX.value;
+          groupX.value;
 
         startY.value =
-          translateY.value;
+          groupY.value;
       })
       .onUpdate((event) => {
-        translateX.value =
+        groupX.value =
           startX.value +
           event.translationX;
 
-        translateY.value =
+        groupY.value =
           startY.value +
           event.translationY;
       })
       .onEnd(() => {
         runOnJS(onDrop)(
-          item.piece,
-          translateX.value,
-          translateY.value
+          groupId,
+          groupX.value,
+          groupY.value
         );
       });
 
@@ -280,11 +380,13 @@ function LoosePiece({
     useAnimatedStyle(
       () => ({
         left:
-          translateX.value -
+          member.x +
+          groupX.value -
           piecePadding,
 
         top:
-          translateY.value -
+          member.y +
+          groupY.value -
           piecePadding,
       })
     );
@@ -298,20 +400,20 @@ function LoosePiece({
           animatedStyle,
           {
             width:
-              visualSize,
+              visualPieceSize,
 
             height:
-              visualSize,
+              visualPieceSize,
 
             zIndex:
-              item.locked
-                ? 10
-                : 100,
+              enabled
+                ? 100
+                : 10,
           },
         ]}
       >
         <PieceImage
-          piece={item.piece}
+          piece={member.piece}
           image={image}
           size={size}
           displaySize={pieceSize}
@@ -322,10 +424,68 @@ function LoosePiece({
 }
 
 
+// A cluster of one or more pieces connected via matching edges (or
+// already locked onto the board). `members` always carry positions
+// that are grid-consistent with each other, so the whole cluster can be
+// dragged as a single rigid shape via one shared (groupX, groupY) delta.
+function PieceGroup({
+  groupId,
+  members,
+  image,
+  size,
+  pieceSize,
+  piecePadding,
+  visualPieceSize,
+  onDrop,
+}) {
+  const groupX =
+    useSharedValue(0);
+
+  const groupY =
+    useSharedValue(0);
+
+
+  // Positions are committed into `members` (React state) as soon as a
+  // drag ends, so the running drag delta resets back to zero.
+  useEffect(() => {
+    groupX.value = 0;
+    groupY.value = 0;
+  }, [members]);
+
+
+  const locked =
+    members[0].locked;
+
+
+  return members.map(
+    (member) => (
+      <GroupMemberPiece
+        key={member.piece}
+        member={member}
+        image={image}
+        size={size}
+        pieceSize={pieceSize}
+        piecePadding={piecePadding}
+        visualPieceSize={visualPieceSize}
+        groupX={groupX}
+        groupY={groupY}
+        enabled={!locked}
+        groupId={groupId}
+        onDrop={onDrop}
+      />
+    )
+  );
+}
+
+
 export default function PuzzleScreen({
   image,
   setScreen,
   difficulty,
+  difficultyLabel,
+  user,
+  resumeState,
+  setResumeState,
 }) {
   const {
     width: windowWidth,
@@ -401,6 +561,44 @@ export default function PuzzleScreen({
     useState(null);
 
 
+  // True from mount until a resumed puzzle's saved piece positions have
+  // been converted back from grid units into this session's pixels (see
+  // the boardLayout effect below) - the board's onLayout only fires
+  // after mount, so that conversion can't happen synchronously.
+  const [
+    resumePending,
+    setResumePending,
+  ] =
+    useState(
+      Boolean(resumeState)
+    );
+
+  const pendingResumeLoosePiecesRef =
+    useRef(null);
+
+  const resumeConsumedRef =
+    useRef(false);
+
+  // Caches the Storage upload result for this puzzle session so autosave
+  // only uploads the photo once - resumed puzzles already have a remote
+  // download URL and skip the upload entirely.
+  const imageInfoRef =
+    useRef(null);
+
+  const saveTimeoutRef =
+    useRef(null);
+
+  // Guards against a slow save (e.g. one that has to upload the photo)
+  // finishing AFTER a newer, faster save and clobbering it with stale
+  // data - only the invocation that's still the latest by the time its
+  // write is about to happen is allowed to actually write.
+  const saveSequenceRef =
+    useRef(0);
+
+  const startTimeRef =
+    useRef(Date.now());
+
+
   const floatX =
     useSharedValue(0);
 
@@ -416,6 +614,42 @@ export default function PuzzleScreen({
 
 
   useEffect(() => {
+    // Only ever consider resumeState at this initial seed - it's read
+    // deliberately without being a dependency below, so a later prop
+    // change (e.g. App.js clearing it once consumed) can't re-trigger
+    // this branch for the same puzzle session.
+    const resumablePieceCount =
+      resumeState
+        ? resumeState.trayPieces.length +
+          resumeState.loosePieces.length
+        : 0;
+
+    if (
+      resumeState &&
+      resumablePieceCount === totalPieces &&
+      !resumeConsumedRef.current
+    ) {
+      resumeConsumedRef.current = true;
+
+      setTrayPieces(
+        resumeState.trayPieces
+      );
+
+      pendingResumeLoosePiecesRef.current =
+        resumeState.loosePieces;
+
+      setLoosePieces([]);
+
+      setTrayDragPiece(null);
+
+      setResumePending(true);
+
+      setResumeState(null);
+
+      return;
+    }
+
+
     const pieces =
       Array.from(
         {
@@ -449,8 +683,45 @@ export default function PuzzleScreen({
     setTrayDragPiece(
       null
     );
+
+    setResumePending(false);
   }, [
     totalPieces,
+  ]);
+
+
+  // Board position is only known once the board View's onLayout fires,
+  // which happens after mount - so a resumed puzzle's grid-unit
+  // positions (relative to the board origin, portable across screen
+  // sizes) can only be converted back to pixels here, not in the
+  // seeding effect above.
+  useEffect(() => {
+    if (
+      !boardLayout ||
+      !pendingResumeLoosePiecesRef.current
+    ) {
+      return;
+    }
+
+    const converted =
+      pendingResumeLoosePiecesRef.current.map(
+        (item) => ({
+          piece: item.piece,
+          x: boardLayout.x + item.gx * pieceSize,
+          y: boardLayout.y + item.gy * pieceSize,
+          locked: item.locked,
+          groupId: item.groupId,
+        })
+      );
+
+    setLoosePieces(converted);
+
+    pendingResumeLoosePiecesRef.current = null;
+
+    setResumePending(false);
+  }, [
+    boardLayout,
+    pieceSize,
   ]);
 
 
@@ -529,81 +800,6 @@ export default function PuzzleScreen({
     );
 
 
-  const finishPiecePosition =
-    useCallback(
-      (
-        piece,
-        x,
-        y
-      ) => {
-        const target =
-          getTarget(
-            piece
-          );
-
-
-        if (target) {
-          const distanceX =
-            Math.abs(
-              x -
-                target.x
-            );
-
-
-          const distanceY =
-            Math.abs(
-              y -
-                target.y
-            );
-
-
-          const snapDistance =
-            Math.max(
-              pieceSize *
-                0.65,
-
-              18
-            );
-
-
-          if (
-            distanceX <
-              snapDistance &&
-
-            distanceY <
-              snapDistance
-          ) {
-            return {
-              piece,
-
-              x:
-                target.x,
-
-              y:
-                target.y,
-
-              locked:
-                true,
-            };
-          }
-        }
-
-
-        return {
-          piece,
-          x,
-          y,
-          locked: false,
-        };
-      },
-
-      [
-        getTarget,
-        pieceSize,
-      ]
-    );
-
-
   const startTrayDrag =
     useCallback(
       (piece) => {
@@ -620,6 +816,10 @@ export default function PuzzleScreen({
     );
 
 
+  // A fresh piece leaving the tray is its own cluster of one. It can
+  // land straight on its correct board slot, OR right up against an
+  // already-placed matching neighbor (locked or not) - either way it
+  // joins that neighbor's cluster.
   const endTrayDrag =
     useCallback(
       (
@@ -646,12 +846,31 @@ export default function PuzzleScreen({
         }
 
 
-        const newPiece =
-          finishPiecePosition(
-            piece,
-            x,
-            y
-          );
+        const result =
+          resolvePlacement({
+            memberIds: [
+              piece,
+            ],
+
+            positions: {
+              [piece]: {
+                x,
+                y,
+              },
+            },
+
+            others:
+              loosePieces,
+
+            size,
+            pieceSize,
+            getTarget,
+          });
+
+
+        const newGroupId =
+          result.mergeWithGroupId ??
+          piece;
 
 
         setTrayPieces(
@@ -665,53 +884,134 @@ export default function PuzzleScreen({
 
 
         setLoosePieces(
-          (pieces) => [
-            ...pieces,
-            newPiece,
-          ]
+          (pieces) => {
+            const updatedOthers =
+              result.mergeWithGroupId
+                ? pieces.map(
+                    (item) =>
+                      item.groupId ===
+                      result.mergeWithGroupId
+                        ? {
+                            ...item,
+                            locked:
+                              result.locked ||
+                              item.locked,
+                          }
+                        : item
+                  )
+                : pieces;
+
+
+            return [
+              ...updatedOthers,
+              {
+                piece,
+
+                x:
+                  result
+                    .positions[
+                    piece
+                  ].x,
+
+                y:
+                  result
+                    .positions[
+                    piece
+                  ].y,
+
+                locked:
+                  result.locked,
+
+                groupId:
+                  newGroupId,
+              },
+            ];
+          }
         );
       },
 
       [
-        finishPiecePosition,
+        loosePieces,
         isOverTray,
+        size,
+        pieceSize,
+        getTarget,
       ]
     );
 
 
-  const dropLoosePiece =
+  // Dragging any piece drags its whole connected cluster (see
+  // PieceGroup). On drop, every member's candidate position is checked
+  // for a board-slot or neighbor-piece snap, and merged into whichever
+  // cluster it touched.
+  const dropGroup =
     useCallback(
       (
-        piece,
-        x,
-        y
+        groupId,
+        deltaX,
+        deltaY
       ) => {
+        const groupMembers =
+          loosePieces.filter(
+            (item) =>
+              item.groupId ===
+              groupId
+          );
+
+
+        if (
+          groupMembers.length ===
+          0
+        ) {
+          return;
+        }
+
+
+        const anchor =
+          groupMembers[0];
+
+        const anchorX =
+          anchor.x +
+          deltaX;
+
+        const anchorY =
+          anchor.y +
+          deltaY;
+
+
         if (
           isOverTray(
-            x,
-            y
+            anchorX,
+            anchorY
           )
         ) {
+          const ids =
+            groupMembers.map(
+              (item) =>
+                item.piece
+            );
+
+
           setLoosePieces(
             (pieces) =>
               pieces.filter(
                 (item) =>
-                  item.piece !==
-                  piece
+                  item.groupId !==
+                  groupId
               )
           );
 
 
           setTrayPieces(
-            (pieces) =>
-              pieces.includes(
-                piece
-              )
-                ? pieces
-                : [
-                    ...pieces,
-                    piece,
-                  ]
+            (pieces) => [
+              ...pieces,
+              ...ids.filter(
+                (id) =>
+                  !pieces.includes(
+                    id
+                  )
+              ),
+            ]
           );
 
 
@@ -719,43 +1019,345 @@ export default function PuzzleScreen({
         }
 
 
-        const finished =
-          finishPiecePosition(
-            piece,
-            x,
-            y
+        const positions =
+          {};
+
+        groupMembers.forEach(
+          (item) => {
+            positions[
+              item.piece
+            ] = {
+              x:
+                item.x +
+                deltaX,
+
+              y:
+                item.y +
+                deltaY,
+            };
+          }
+        );
+
+
+        const others =
+          loosePieces.filter(
+            (item) =>
+              item.groupId !==
+              groupId
           );
+
+
+        const result =
+          resolvePlacement({
+            memberIds:
+              groupMembers.map(
+                (item) =>
+                  item.piece
+              ),
+
+            positions,
+            others,
+            size,
+            pieceSize,
+            getTarget,
+          });
+
+
+        const newGroupId =
+          result.mergeWithGroupId ??
+          groupId;
 
 
         setLoosePieces(
           (pieces) =>
             pieces.map(
-              (item) =>
-                item.piece ===
-                piece
-                  ? finished
-                  : item
+              (item) => {
+                if (
+                  item.groupId ===
+                  groupId
+                ) {
+                  return {
+                    ...item,
+
+                    x:
+                      result
+                        .positions[
+                        item
+                          .piece
+                      ].x,
+
+                    y:
+                      result
+                        .positions[
+                        item
+                          .piece
+                      ].y,
+
+                    locked:
+                      result.locked ||
+                      item.locked,
+
+                    groupId:
+                      newGroupId,
+                  };
+                }
+
+
+                if (
+                  result.mergeWithGroupId &&
+                  item.groupId ===
+                    result.mergeWithGroupId
+                ) {
+                  return {
+                    ...item,
+
+                    locked:
+                      result.locked ||
+                      item.locked,
+                  };
+                }
+
+
+                return item;
+              }
             )
         );
       },
 
       [
-        finishPiecePosition,
+        loosePieces,
         isOverTray,
+        size,
+        pieceSize,
+        getTarget,
       ]
     );
 
 
-  const solvedCount =
-    loosePieces.filter(
-      (piece) =>
-        piece.locked
-    ).length;
+  const pieceGroups =
+    useMemo(() => {
+      const map =
+        new Map();
+
+      loosePieces.forEach(
+        (item) => {
+          if (
+            !map.has(
+              item.groupId
+            )
+          ) {
+            map.set(
+              item.groupId,
+              []
+            );
+          }
+
+          map
+            .get(
+              item.groupId
+            )
+            .push(item);
+        }
+      );
+
+      return Array.from(
+        map.entries()
+      ).map(
+        ([
+          groupId,
+          members,
+        ]) => ({
+          groupId,
+          members,
+        })
+      );
+    }, [
+      loosePieces,
+    ]);
 
 
+  // Solved once every piece is out of the tray and connected into a
+  // single cluster - it no longer needs to be sitting on the board.
   const isSolved =
-    solvedCount ===
-    totalPieces;
+    loosePieces.length ===
+      totalPieces &&
+    pieceGroups.length ===
+      1;
+
+
+  // Writes the current arrangement to Firestore. loosePieces are
+  // converted to grid units (relative to the board origin, in piece
+  // widths) so a resume on a different screen size still lines up - see
+  // the boardLayout conversion effect above for the inverse.
+  const flushSave =
+    useCallback(async () => {
+      if (
+        !user ||
+        !boardLayout ||
+        resumePending ||
+        isSolved
+      ) {
+        return;
+      }
+
+      const mySequence =
+        ++saveSequenceRef.current;
+
+      try {
+        let imageInfo =
+          imageInfoRef.current;
+
+        if (!imageInfo) {
+          imageInfo =
+            image.startsWith('http')
+              ? { path: null, downloadUrl: image }
+              : await uploadInProgressImage(
+                  user.uid,
+                  image
+                );
+
+          imageInfoRef.current =
+            imageInfo;
+        }
+
+        // A newer call started (and captured more current piece
+        // positions) while this one was uploading - let IT write
+        // instead, so a slow upload can't clobber fresher data.
+        if (
+          mySequence !==
+          saveSequenceRef.current
+        ) {
+          return;
+        }
+
+        const gridLoosePieces =
+          loosePieces.map(
+            (item) => ({
+              piece: item.piece,
+              gx: (item.x - boardLayout.x) / pieceSize,
+              gy: (item.y - boardLayout.y) / pieceSize,
+              locked: item.locked,
+              groupId: item.groupId,
+            })
+          );
+
+        await saveInProgressPuzzle(
+          user.uid,
+          {
+            size,
+            difficultyLabel,
+            totalPieces,
+            trayPieces,
+            loosePieces: gridLoosePieces,
+            imagePath: imageInfo.path,
+            imageDownloadUrl: imageInfo.downloadUrl,
+          }
+        );
+      } catch (error) {
+        console.log(
+          'Could not save puzzle progress:',
+          error
+        );
+      }
+    }, [
+      user,
+      boardLayout,
+      resumePending,
+      isSolved,
+      image,
+      loosePieces,
+      trayPieces,
+      size,
+      difficultyLabel,
+      totalPieces,
+      pieceSize,
+    ]);
+
+
+  // Debounced autosave: coalesces rapid successive piece drops into one
+  // write instead of saving on every single change.
+  useEffect(() => {
+    if (
+      !user ||
+      !boardLayout ||
+      resumePending ||
+      isSolved
+    ) {
+      return;
+    }
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current =
+      setTimeout(() => {
+        flushSave();
+      }, 1500);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [
+    trayPieces,
+    loosePieces,
+    flushSave,
+  ]);
+
+
+  // Always points at the latest flushSave (which itself closes over the
+  // latest piece positions) - used by the unmount cleanup below, whose
+  // own closure would otherwise be stuck with whatever flushSave looked
+  // like on the render it was created.
+  const flushSaveRef =
+    useRef(flushSave);
+
+  useEffect(() => {
+    flushSaveRef.current = flushSave;
+  }, [flushSave]);
+
+  useEffect(() => {
+    return () => {
+      flushSaveRef.current();
+    };
+  }, []);
+
+
+  useEffect(() => {
+    if (!isSolved || !user) {
+      return;
+    }
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    const elapsedSeconds =
+      Math.round(
+        (Date.now() - startTimeRef.current) / 1000
+      );
+
+    saveCompletedPuzzle(
+      user.uid,
+      {
+        size,
+        difficultyLabel,
+        totalPieces,
+        elapsedSeconds,
+      }
+    )
+      .then(() =>
+        clearInProgressPuzzle(user.uid)
+      )
+      .catch((error) => {
+        console.log(
+          'Could not save completed puzzle:',
+          error
+        );
+      });
+  }, [isSolved]);
 
 
   return (
@@ -818,6 +1420,17 @@ export default function PuzzleScreen({
           }
         >
           Puzzle Complete! 🎉
+        </Text>
+      )}
+
+
+      {resumePending && (
+        <Text
+          style={
+            styles.loadingText
+          }
+        >
+          Loading your puzzle...
         </Text>
       )}
 
@@ -909,10 +1522,13 @@ export default function PuzzleScreen({
           styles.backButton
         }
         onPress={
-          () =>
+          () => {
+            flushSave();
+
             setScreen(
               'menu'
-            )
+            );
+          }
         }
       >
         <Text
@@ -931,15 +1547,22 @@ export default function PuzzleScreen({
           StyleSheet.absoluteFill
         }
       >
-        {loosePieces.map(
-          (item) => (
-            <LoosePiece
+        {pieceGroups.map(
+          ({
+            groupId,
+            members,
+          }) => (
+            <PieceGroup
               key={
-                item.piece
+                groupId
               }
 
-              item={
-                item
+              groupId={
+                groupId
+              }
+
+              members={
+                members
               }
 
               image={
@@ -954,8 +1577,16 @@ export default function PuzzleScreen({
                 pieceSize
               }
 
+              piecePadding={
+                piecePadding
+              }
+
+              visualPieceSize={
+                visualPieceSize
+              }
+
               onDrop={
-                dropLoosePiece
+                dropGroup
               }
             />
           )
@@ -1021,6 +1652,18 @@ const styles =
 
       paddingHorizontal:
         16,
+    },
+
+
+    loadingText: {
+      color:
+        '#cfc5dc',
+
+      fontSize:
+        15,
+
+      marginTop:
+        12,
     },
 
 

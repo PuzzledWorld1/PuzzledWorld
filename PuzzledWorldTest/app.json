@@ -3,6 +3,7 @@
     "name": "PuzzledWorldTest",
     "slug": "PuzzledWorldTest",
     "version": "1.0.0",
+    "scheme": "puzzledworld",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

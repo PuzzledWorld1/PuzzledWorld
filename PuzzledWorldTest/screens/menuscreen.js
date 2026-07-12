@@ -10,6 +10,8 @@ import { StatusBar } from 'expo-status-bar';
 
 import * as ImagePicker from 'expo-image-picker';
 
+import { DIFFICULTIES } from '../constants/difficulties';
+
 
 export default function MenuScreen({
   setScreen,
@@ -17,46 +19,8 @@ export default function MenuScreen({
   setImage,
   setImageOrientation,
   setDifficulty,
+  setDifficultyLabel,
 }) {
-  const difficulties = [
-    {
-      label: 'Beginner',
-      pieces: 36,
-      size: 6,
-    },
-
-    {
-      label: 'Casual',
-      pieces: 64,
-      size: 8,
-    },
-
-    {
-      label: 'Intermediate',
-      pieces: 100,
-      size: 10,
-    },
-
-    {
-      label: 'Advanced',
-      pieces: 144,
-      size: 12,
-    },
-
-    {
-      label: 'Master',
-      pieces: 225,
-      size: 15,
-    },
-
-    {
-      label: 'Expert',
-      pieces: 400,
-      size: 20,
-    },
-  ];
-
-
   const pickImage = async () => {
     const permission =
       await ImagePicker
@@ -165,12 +129,14 @@ export default function MenuScreen({
 
 
       {image &&
-        difficulties.map((level) => (
+        DIFFICULTIES.map((level) => (
           <Pressable
             key={level.label}
             style={styles.smallButton}
             onPress={() => {
               setDifficulty(level.size);
+
+              setDifficultyLabel(level.label);
 
               setScreen('puzzle');
             }}
