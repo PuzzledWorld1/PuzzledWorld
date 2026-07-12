@@ -2,11 +2,12 @@ const { getDefaultConfig } = require('expo/metro-config');
 
 const config = getDefaultConfig(__dirname);
 
-// The Firebase JS SDK's package.json "exports" map resolves differently
-// under Metro's package-exports support than under Node/webpack, which
-// surfaces as a runtime "Component auth has not been registered yet"
-// error instead of a build-time one. Disabling it is the standard fix
-// until Firebase's exports map is Metro-compatible.
-config.resolver.unstable_enablePackageExports = false;
+// @firebase/auth's package.json "exports" map has a dedicated
+// "react-native" condition (dist/rn/index.js) that's the only build
+// containing getReactNativePersistence and working native networking -
+// package-exports resolution needs to be ON for Metro to ever reach it,
+// or native falls back to the generic Node/browser build and auth
+// breaks silently on-device.
+config.resolver.unstable_enablePackageExports = true;
 
 module.exports = config;
