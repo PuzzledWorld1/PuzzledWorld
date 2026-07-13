@@ -21,6 +21,7 @@ export default function HomeScreen({
   setDifficultyLabel,
   setArtworkTitle,
   setArtworkArtist,
+  setArtworkId,
   setResumeState,
   colors,
   themeMode,
@@ -64,6 +65,7 @@ export default function HomeScreen({
       setDifficultyLabel(data.difficultyLabel);
       setArtworkTitle(null);
       setArtworkArtist(null);
+      setArtworkId(null);
 
       setResumeState({
         trayPieces: data.trayPieces,

@@ -55,6 +55,7 @@ import {
 } from '../lib/puzzleData';
 
 import { uploadInProgressImage } from '../lib/puzzleImage';
+import { markArtworkCompleted } from '../lib/artworkStatus';
 
 
 // Must match boardFrame's padding + borderWidth below - the frame (not
@@ -702,6 +703,7 @@ export default function PuzzleScreen({
   difficultyLabel,
   artworkTitle,
   artworkArtist,
+  artworkId,
   user,
   resumeState,
   setResumeState,
@@ -1782,6 +1784,17 @@ export default function PuzzleScreen({
             (error?.message ?? error)
         );
       });
+
+    if (artworkId) {
+      markArtworkCompleted(user.uid, artworkId).catch(
+        (error) => {
+          console.log(
+            'Could not mark artwork completed:',
+            error
+          );
+        }
+      );
+    }
   }, [isSolved]);
 
 

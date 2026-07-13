@@ -34,10 +34,6 @@ function withTimeout(promise, ms) {
 }
 
 
-// Tries the full-resolution copy on Wikimedia Commons first (better quality
-// puzzle pieces); if that's unreachable or too slow, falls back to the
-// lower-res copy already bundled with the app, which works with zero
-// connectivity since it's part of the app binary.
 async function resolveArtworkImage(artwork) {
   try {
     const destination = new File(
@@ -70,7 +66,10 @@ async function resolveArtworkImage(artwork) {
 }
 
 
-export default function GalleryScreen({
+// The "Completed" folder - every Gallery artwork this account has
+// finished a puzzle of at least once. Picking one starts a fresh puzzle
+// with it again, same as the main Gallery screen.
+export default function CompletedScreen({
   setScreen,
   setImage,
   setImageOrientation,
@@ -93,21 +92,32 @@ export default function GalleryScreen({
   const [favoriteIds, setFavoriteIds] =
     useState([]);
 
+  const [loaded, setLoaded] =
+    useState(false);
+
   useEffect(() => {
     if (!user) {
       setCompletedIds([]);
       setFavoriteIds([]);
+      setLoaded(true);
       return;
     }
 
-    listCompletedArtworkIds(user.uid).then(
-      setCompletedIds
-    );
-
-    listFavoriteArtworkIds(user.uid).then(
-      setFavoriteIds
-    );
+    Promise.all([
+      listCompletedArtworkIds(user.uid),
+      listFavoriteArtworkIds(user.uid),
+    ]).then(([completed, favorites]) => {
+      setCompletedIds(completed);
+      setFavoriteIds(favorites);
+      setLoaded(true);
+    });
   }, [user]);
+
+
+  const completedArtworks =
+    GALLERY_ARTWORKS.filter((artwork) =>
+      completedIds.includes(artwork.id)
+    );
 
 
   const pickArtwork = async (artwork) => {
@@ -143,10 +153,7 @@ export default function GalleryScreen({
 
   const toggleFavorite = async (artwork) => {
     if (!user) {
-      alert(
-        'Sign in to save favorites.'
-      );
-
+      alert('Sign in to save favorites.');
       return;
     }
 
@@ -155,9 +162,7 @@ export default function GalleryScreen({
 
     setFavoriteIds((current) =>
       isFavorited
-        ? current.filter(
-            (id) => id !== artwork.id
-          )
+        ? current.filter((id) => id !== artwork.id)
         : [...current, artwork.id]
     );
 
@@ -173,7 +178,6 @@ export default function GalleryScreen({
         error
       );
 
-      // Roll back the optimistic update on failure.
       setFavoriteIds((current) =>
         isFavorited
           ? [...current, artwork.id]
@@ -190,32 +194,24 @@ export default function GalleryScreen({
       <StatusBar style={colors.statusBarStyle} />
 
       <Text style={styles.title}>
-        Gallery
+        ✅ Completed
       </Text>
 
-      <View style={styles.folderRow}>
-        <Pressable
-          style={styles.folderButton}
-          onPress={() => setScreen('completed')}
-        >
-          <Text style={styles.folderButtonText}>
-            ✅ Completed
-          </Text>
-        </Pressable>
+      {!user && (
+        <Text style={styles.emptyText}>
+          Sign in to track completed puzzles.
+        </Text>
+      )}
 
-        <Pressable
-          style={styles.folderButton}
-          onPress={() => setScreen('favorites')}
-        >
-          <Text style={styles.folderButtonText}>
-            ❤️ Favorites
-          </Text>
-        </Pressable>
-      </View>
+      {user && loaded && completedArtworks.length === 0 && (
+        <Text style={styles.emptyText}>
+          Finish a Gallery puzzle to see it here.
+        </Text>
+      )}
 
       <FlatList
         style={styles.list}
-        data={GALLERY_ARTWORKS}
+        data={completedArtworks}
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
@@ -224,7 +220,7 @@ export default function GalleryScreen({
           <ArtworkTile
             artwork={item}
             picking={pickingId === item.id}
-            completed={completedIds.includes(item.id)}
+            completed
             favorited={favoriteIds.includes(item.id)}
             onPress={() => pickArtwork(item)}
             onToggleFavorite={() =>
@@ -238,7 +234,7 @@ export default function GalleryScreen({
       <View style={styles.footer}>
         <Pressable
           style={styles.backButton}
-          onPress={() => setScreen('menu')}
+          onPress={() => setScreen('gallery')}
         >
           <Text style={styles.backText}>
             Back
@@ -271,23 +267,12 @@ function getStyles(colors) {
       fontWeight: 'bold',
     },
 
-    folderRow: {
-      flexDirection: 'row',
-      marginTop: 12,
-    },
-
-    folderButton: {
-      backgroundColor: colors.buttonSecondary,
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderRadius: 12,
-      marginHorizontal: 6,
-    },
-
-    folderButtonText: {
-      color: colors.buttonText,
+    emptyText: {
+      color: colors.textSecondary,
       fontSize: 13,
-      fontWeight: 'bold',
+      textAlign: 'center',
+      marginTop: 16,
+      paddingHorizontal: 20,
     },
 
     list: {

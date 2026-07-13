@@ -30,6 +30,7 @@ export default function MenuScreen({
   artworkTitle,
   setArtworkTitle,
   setArtworkArtist,
+  setArtworkId,
   user,
   colors,
   themeMode,
@@ -143,6 +144,7 @@ export default function MenuScreen({
 
       setArtworkTitle(null);
       setArtworkArtist(null);
+      setArtworkId(null);
 
       setScreen('crop');
     }
@@ -237,7 +239,13 @@ export default function MenuScreen({
               setScreen('puzzle');
             }}
           >
-            <Text style={styles.buttonText}>
+            <Text
+              style={[
+                styles.buttonText,
+                level.label === 'Intermediate' &&
+                  styles.buttonTextSmall,
+              ]}
+            >
               {level.label}
               {' - '}
               {level.pieces}
@@ -330,6 +338,11 @@ function getStyles(colors) {
     buttonText: {
       color: colors.buttonText,
       fontSize: 14,
+      fontWeight: 'bold',
+    },
+
+    buttonTextSmall: {
+      fontSize: 13,
       fontWeight: 'bold',
     },
 

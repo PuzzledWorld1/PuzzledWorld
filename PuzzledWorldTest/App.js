@@ -5,6 +5,8 @@ import { useFonts } from 'expo-font';
 import HomeScreen from './screens/homescreen';
 import MenuScreen from './screens/menuscreen';
 import GalleryScreen from './screens/galleryscreen';
+import CompletedScreen from './screens/completedscreen';
+import FavoritesScreen from './screens/favoritesscreen';
 import CropScreen from './screens/cropscreen';
 import PuzzleScreen from './screens/puzzlescreen';
 import AuthScreen from './screens/authscreen';
@@ -28,6 +30,8 @@ function CurrentScreen({
   setArtworkTitle,
   artworkArtist,
   setArtworkArtist,
+  artworkId,
+  setArtworkId,
   user,
   authInitializing,
   resumeState,
@@ -59,6 +63,7 @@ function CurrentScreen({
         artworkTitle={artworkTitle}
         setArtworkTitle={setArtworkTitle}
         setArtworkArtist={setArtworkArtist}
+        setArtworkId={setArtworkId}
         user={user}
         colors={colors}
         themeMode={themeMode}
@@ -75,6 +80,42 @@ function CurrentScreen({
         setImageOrientation={setImageOrientation}
         setArtworkTitle={setArtworkTitle}
         setArtworkArtist={setArtworkArtist}
+        setArtworkId={setArtworkId}
+        user={user}
+        colors={colors}
+        themeMode={themeMode}
+        toggleThemeMode={toggleThemeMode}
+      />
+    );
+  }
+
+  if (screen === 'completed') {
+    return (
+      <CompletedScreen
+        setScreen={setScreen}
+        setImage={setImage}
+        setImageOrientation={setImageOrientation}
+        setArtworkTitle={setArtworkTitle}
+        setArtworkArtist={setArtworkArtist}
+        setArtworkId={setArtworkId}
+        user={user}
+        colors={colors}
+        themeMode={themeMode}
+        toggleThemeMode={toggleThemeMode}
+      />
+    );
+  }
+
+  if (screen === 'favorites') {
+    return (
+      <FavoritesScreen
+        setScreen={setScreen}
+        setImage={setImage}
+        setImageOrientation={setImageOrientation}
+        setArtworkTitle={setArtworkTitle}
+        setArtworkArtist={setArtworkArtist}
+        setArtworkId={setArtworkId}
+        user={user}
         colors={colors}
         themeMode={themeMode}
         toggleThemeMode={toggleThemeMode}
@@ -105,6 +146,7 @@ function CurrentScreen({
         difficultyLabel={difficultyLabel}
         artworkTitle={artworkTitle}
         artworkArtist={artworkArtist}
+        artworkId={artworkId}
         user={user}
         resumeState={resumeState}
         setResumeState={setResumeState}
@@ -125,6 +167,7 @@ function CurrentScreen({
       setDifficultyLabel={setDifficultyLabel}
       setArtworkTitle={setArtworkTitle}
       setArtworkArtist={setArtworkArtist}
+      setArtworkId={setArtworkId}
       setResumeState={setResumeState}
       colors={colors}
       themeMode={themeMode}
@@ -141,6 +184,7 @@ export default function App() {
   const [difficultyLabel, setDifficultyLabel] = useState(null);
   const [artworkTitle, setArtworkTitle] = useState(null);
   const [artworkArtist, setArtworkArtist] = useState(null);
+  const [artworkId, setArtworkId] = useState(null);
 
   const [user, setUser] = useState(null);
   const [authInitializing, setAuthInitializing] = useState(true);
@@ -205,6 +249,7 @@ export default function App() {
         setDifficultyLabel(shared.difficultyLabel);
         setArtworkTitle(null);
         setArtworkArtist(null);
+        setArtworkId(null);
         setScreen('puzzle');
       } catch (error) {
         console.log('Could not load shared puzzle:', error);
@@ -253,6 +298,8 @@ export default function App() {
         setArtworkTitle={setArtworkTitle}
         artworkArtist={artworkArtist}
         setArtworkArtist={setArtworkArtist}
+        artworkId={artworkId}
+        setArtworkId={setArtworkId}
         user={user}
         authInitializing={authInitializing}
         resumeState={resumeState}
