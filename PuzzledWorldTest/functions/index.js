@@ -170,3 +170,66 @@ exports.moderateAndPublishSharedPuzzle = onCall(async (request) => {
 
   return { shareId };
 });
+
+
+// Permanently deletes a user's account and everything tied to it - their
+// Firestore data (in-progress puzzle, completed-puzzle history, favorited
+// and completed gallery artworks), any puzzles they've shared publicly
+// (both the Firestore doc and the public image in Storage), their
+// resume-slot photo in Storage, and finally the Firebase Auth account
+// itself. Runs via the Admin SDK, which bypasses both the Firestore/
+// Storage security rules (clients can't list or delete sharedPuzzles
+// themselves) and Firebase Auth's "recent login required" restriction -
+// so this works even if the user signed in a while ago.
+exports.deleteAccount = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError(
+      'unauthenticated',
+      'You must be signed in to delete your account.'
+    );
+  }
+
+  const uid = request.auth.uid;
+  const bucket = admin.storage().bucket();
+
+  await admin
+    .firestore()
+    .recursiveDelete(
+      admin.firestore().collection('users').doc(uid)
+    );
+
+  const sharedSnapshot = await admin
+    .firestore()
+    .collection('sharedPuzzles')
+    .where('createdBy', '==', uid)
+    .get();
+
+  await Promise.all(
+    sharedSnapshot.docs.map(async (sharedDoc) => {
+      await bucket
+        .file(`shared/${sharedDoc.id}.jpg`)
+        .delete()
+        .catch((error) => {
+          logger.error(
+            'Could not delete shared puzzle image',
+            { shareId: sharedDoc.id, error }
+          );
+        });
+
+      await sharedDoc.ref.delete();
+    })
+  );
+
+  await bucket
+    .deleteFiles({ prefix: `users/${uid}/` })
+    .catch((error) => {
+      logger.error(
+        'Could not delete storage files for user',
+        { uid, error }
+      );
+    });
+
+  await admin.auth().deleteUser(uid);
+
+  return { success: true };
+});

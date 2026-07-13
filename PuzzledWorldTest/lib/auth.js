@@ -9,7 +9,9 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 
-import { auth } from '../firebase/config';
+import { httpsCallable } from 'firebase/functions';
+
+import { auth, functions } from '../firebase/config';
 
 
 const ERROR_MESSAGES = {
@@ -55,6 +57,22 @@ export async function signIn(email, password) {
 
 
 export async function signOutUser() {
+  await signOut(auth);
+}
+
+
+// Deletes the signed-in user's account and all their data (see the
+// deleteAccount Cloud Function in functions/index.js), then signs out
+// locally so the app reflects the signed-out state immediately.
+export async function deleteAccount() {
+  const deleteAccountCall = httpsCallable(functions, 'deleteAccount');
+
+  try {
+    await deleteAccountCall();
+  } catch (error) {
+    throw new Error(friendlyError(error));
+  }
+
   await signOut(auth);
 }
 

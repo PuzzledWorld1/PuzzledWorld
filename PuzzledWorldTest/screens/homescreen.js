@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-import { signOutUser } from '../lib/auth';
+import { deleteAccount, signOutUser } from '../lib/auth';
 import {
   hasInProgressPuzzle,
   loadInProgressPuzzle,
@@ -32,6 +32,7 @@ export default function HomeScreen({
   const [canResume, setCanResume] = useState(false);
   const [completedCount, setCompletedCount] = useState(null);
   const [resuming, setResuming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
 
   useEffect(() => {
@@ -79,6 +80,44 @@ export default function HomeScreen({
   };
 
 
+  const runDeleteAccount = async () => {
+    setDeleting(true);
+
+    try {
+      await deleteAccount();
+    } catch (error) {
+      console.log('Could not delete account:', error);
+
+      alert(
+        'Could not delete your account: ' +
+          (error?.message ?? error)
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
+  const confirmDeleteAccount = () => {
+    Alert.alert(
+      'Delete your account?',
+      'This permanently deletes your account, saved puzzles, favorites, and completed-puzzle history. This cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: runDeleteAccount,
+        },
+      ]
+    );
+  };
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>🧩</Text>
@@ -120,6 +159,15 @@ export default function HomeScreen({
               <Pressable onPress={signOutUser}>
                 <Text style={styles.linkText}>Sign Out</Text>
               </Pressable>
+
+              <Pressable
+                onPress={confirmDeleteAccount}
+                disabled={deleting}
+              >
+                <Text style={styles.deleteText}>
+                  {deleting ? 'Deleting…' : 'Delete my account'}
+                </Text>
+              </Pressable>
             </>
           ) : (
             <Pressable onPress={() => setScreen('auth')}>
@@ -160,6 +208,7 @@ function getStyles(colors) {
     accountText: { color: colors.textPrimary, fontSize: 15 },
     accountSubtext: { color: colors.textSecondary, fontSize: 14, marginTop: 4 },
     linkText: { color: colors.linkText, fontSize: 15, marginTop: 6, textDecorationLine: 'underline' },
+    deleteText: { color: '#dc2626', fontSize: 12, marginTop: 10, textDecorationLine: 'underline', opacity: 0.8 },
     button: { backgroundColor: colors.buttonPrimary, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 14, width: '100%', alignItems: 'center' },
     resumeButton: { backgroundColor: colors.resumeButtonBackground, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 6, width: '100%', alignItems: 'center' },
     buttonText: { color: colors.buttonText, fontSize: 18, fontWeight: 'bold' },
