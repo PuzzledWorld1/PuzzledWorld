@@ -16,9 +16,13 @@ import {
   signUp,
   signInWithGoogleWeb,
 } from '../lib/auth';
+import ThemeToggle from '../components/ThemeToggle';
+import { withAppFont } from '../constants/typography';
 
 
-export default function AuthScreen({ setScreen }) {
+export default function AuthScreen({ setScreen, colors, themeMode, toggleThemeMode }) {
+  const styles = getStyles(colors);
+
   const [mode, setMode] = useState('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -63,7 +67,7 @@ export default function AuthScreen({ setScreen }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style={colors.statusBarStyle} />
 
       <Text style={styles.logo}>🧩</Text>
 
@@ -78,7 +82,7 @@ export default function AuthScreen({ setScreen }) {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        placeholderTextColor="#8f8399"
+        placeholderTextColor={colors.textSecondary}
         autoCapitalize="none"
         keyboardType="email-address"
         value={email}
@@ -88,7 +92,7 @@ export default function AuthScreen({ setScreen }) {
       <TextInput
         style={styles.input}
         placeholder="Password"
-        placeholderTextColor="#8f8399"
+        placeholderTextColor={colors.textSecondary}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -145,97 +149,104 @@ export default function AuthScreen({ setScreen }) {
           Back
         </Text>
       </Pressable>
+
+      <ThemeToggle
+        themeMode={themeMode}
+        toggleThemeMode={toggleThemeMode}
+      />
     </View>
   );
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#17111f',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 25,
-  },
+function getStyles(colors) {
+  return StyleSheet.create(withAppFont({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 25,
+    },
 
-  logo: {
-    fontSize: 50,
-    marginBottom: 6,
-  },
+    logo: {
+      fontSize: 50,
+      marginBottom: 6,
+    },
 
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 8,
-  },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
 
-  subtitle: {
-    color: '#cfc5dc',
-    textAlign: 'center',
-    fontSize: 15,
-    marginBottom: 24,
-  },
+    subtitle: {
+      color: colors.textSecondary,
+      textAlign: 'center',
+      fontSize: 15,
+      marginBottom: 24,
+    },
 
-  input: {
-    width: '100%',
-    backgroundColor: '#1d1626',
-    color: 'white',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    marginBottom: 12,
-  },
+    input: {
+      width: '100%',
+      backgroundColor: colors.boardTrayBackground,
+      color: colors.textPrimary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      fontSize: 16,
+      marginBottom: 12,
+    },
 
-  error: {
-    color: '#f87171',
-    fontSize: 14,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
+    error: {
+      color: '#f87171',
+      fontSize: 14,
+      marginBottom: 12,
+      textAlign: 'center',
+    },
 
-  button: {
-    backgroundColor: '#8b5cf6',
-    paddingVertical: 15,
-    borderRadius: 18,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 6,
-  },
+    button: {
+      backgroundColor: colors.buttonPrimary,
+      paddingVertical: 15,
+      borderRadius: 18,
+      width: '100%',
+      alignItems: 'center',
+      marginTop: 6,
+    },
 
-  googleButton: {
-    backgroundColor: '#3b3145',
-    paddingVertical: 15,
-    borderRadius: 18,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 12,
-  },
+    googleButton: {
+      backgroundColor: colors.resumeButtonBackground,
+      paddingVertical: 15,
+      borderRadius: 18,
+      width: '100%',
+      alignItems: 'center',
+      marginTop: 12,
+    },
 
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+    buttonText: {
+      color: colors.buttonText,
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
 
-  switchText: {
-    color: '#cfc5dc',
-    marginTop: 22,
-    fontSize: 15,
-  },
+    switchText: {
+      color: colors.textSecondary,
+      marginTop: 22,
+      fontSize: 15,
+    },
 
-  skipText: {
-    color: '#cfc5dc',
-    marginTop: 18,
-    fontSize: 15,
-    textDecorationLine: 'underline',
-  },
+    skipText: {
+      color: colors.textSecondary,
+      marginTop: 18,
+      fontSize: 15,
+      textDecorationLine: 'underline',
+    },
 
-  backText: {
-    color: '#8f8399',
-    marginTop: 24,
-    fontSize: 15,
-  },
-});
+    backText: {
+      color: colors.textSecondary,
+      marginTop: 24,
+      fontSize: 15,
+    },
+  }));
+}

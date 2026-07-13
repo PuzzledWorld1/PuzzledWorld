@@ -1,16 +1,23 @@
 import {
+  Alert,
   Image,
   Pressable,
   StyleSheet,
   Text,
+  View,
   ScrollView,
 } from 'react-native';
 
 import { StatusBar } from 'expo-status-bar';
 
+import { useState } from 'react';
+
 import * as ImagePicker from 'expo-image-picker';
 
 import { DIFFICULTIES } from '../constants/difficulties';
+import ThemeToggle from '../components/ThemeToggle';
+import { withAppFont } from '../constants/typography';
+import { reportImage } from '../lib/reports';
 
 
 export default function MenuScreen({
@@ -20,7 +27,71 @@ export default function MenuScreen({
   setImageOrientation,
   setDifficulty,
   setDifficultyLabel,
+  artworkTitle,
+  setArtworkTitle,
+  setArtworkArtist,
+  user,
+  colors,
+  themeMode,
+  toggleThemeMode,
 }) {
+  const styles = getStyles(colors);
+
+  const [reporting, setReporting] =
+    useState(false);
+
+  // Gallery art is already vetted museum content and always has a
+  // title/artist set - a report button only makes sense for a photo the
+  // person just brought in themselves.
+  const isOwnUpload =
+    Boolean(image) && !artworkTitle;
+
+  const submitReport = async () => {
+    setReporting(true);
+
+    try {
+      await reportImage({
+        uid: user?.uid,
+        localImageUri: image,
+        context: 'byoa-preview',
+      });
+
+      alert(
+        'Thanks - this has been sent for review.'
+      );
+    } catch (error) {
+      console.log(
+        'Could not submit report:',
+        error
+      );
+
+      alert(
+        'Could not submit the report. Please try again.'
+      );
+    } finally {
+      setReporting(false);
+    }
+  };
+
+  const confirmReport = () => {
+    Alert.alert(
+      'Report this image?',
+      'This sends the image to the developer for review as potentially inappropriate content.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+
+        {
+          text: 'Report',
+          style: 'destructive',
+          onPress: submitReport,
+        },
+      ]
+    );
+  };
+
   const pickImage = async () => {
     const permission =
       await ImagePicker
@@ -70,6 +141,9 @@ export default function MenuScreen({
         orientation
       );
 
+      setArtworkTitle(null);
+      setArtworkArtist(null);
+
       setScreen('crop');
     }
   };
@@ -93,23 +167,31 @@ export default function MenuScreen({
         style={styles.button}
         onPress={pickImage}
       >
-        <Text style={styles.buttonText}>
-          📷 Pick a Memory
-        </Text>
+        <View style={styles.buttonRow}>
+          <Text style={styles.buttonEmoji}>
+            📷
+          </Text>
+
+          <Text style={styles.buttonText}>
+            Bring Your Own Art
+          </Text>
+        </View>
       </Pressable>
 
 
-      <Pressable style={styles.button}>
-        <Text style={styles.buttonText}>
-          🎨 Artist Gallery
-        </Text>
-      </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={() => setScreen('gallery')}
+      >
+        <View style={styles.buttonRow}>
+          <Text style={styles.buttonEmoji}>
+            🎨
+          </Text>
 
-
-      <Pressable style={styles.button}>
-        <Text style={styles.buttonText}>
-          ❓ Mystery Puzzle
-        </Text>
+          <Text style={styles.buttonText}>
+            Gallery
+          </Text>
+        </View>
       </Pressable>
 
 
@@ -118,6 +200,20 @@ export default function MenuScreen({
           source={{ uri: image }}
           style={styles.previewImage}
         />
+      )}
+
+      {isOwnUpload && (
+        <Pressable
+          style={styles.reportButton}
+          disabled={reporting}
+          onPress={confirmReport}
+        >
+          <Text style={styles.reportText}>
+            {reporting
+              ? '🚩 Reporting…'
+              : '🚩 Report this image'}
+          </Text>
+        </Pressable>
       )}
 
 
@@ -161,82 +257,109 @@ export default function MenuScreen({
         </Text>
       </Pressable>
 
+      <ThemeToggle
+        themeMode={themeMode}
+        toggleThemeMode={toggleThemeMode}
+      />
 
-      <StatusBar style="light" />
+
+      <StatusBar style={colors.statusBarStyle} />
     </ScrollView>
   );
 }
 
 
-const styles = StyleSheet.create({
-  scroll: {
-    flex: 1,
-    backgroundColor: '#17111f',
-  },
+function getStyles(colors) {
+  return StyleSheet.create(withAppFont({
+    scroll: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    backgroundColor: '#17111f',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 25,
-    paddingTop: 60,
-    paddingBottom: 80,
-  },
+    container: {
+      flexGrow: 1,
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      paddingVertical: 30,
+    },
 
-  logo: {
-    fontSize: 70,
-    marginBottom: 10,
-  },
+    logo: {
+      fontSize: 44,
+      marginBottom: 4,
+    },
 
-  title: {
-    fontSize: 34,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 12,
-  },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
 
-  button: {
-    backgroundColor: '#8b5cf6',
-    paddingVertical: 15,
-    paddingHorizontal: 35,
-    borderRadius: 18,
-    marginTop: 14,
-    width: '100%',
-    alignItems: 'center',
-  },
+    button: {
+      backgroundColor: colors.buttonSecondary,
+      paddingVertical: 9,
+      paddingHorizontal: 35,
+      borderRadius: 14,
+      marginTop: 8,
+      width: '65%',
+      alignItems: 'center',
+    },
 
-  smallButton: {
-    backgroundColor: '#8b5cf6',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 14,
-    marginTop: 8,
-    width: '100%',
-    alignItems: 'center',
-  },
+    smallButton: {
+      backgroundColor: colors.buttonPrimary,
+      paddingVertical: 6,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+      marginTop: 6,
+      width: '70%',
+      alignItems: 'center',
+    },
 
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+    buttonRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
 
-  previewImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 15,
-    marginTop: 20,
-  },
+    buttonEmoji: {
+      fontSize: 14,
+      marginRight: 6,
+    },
 
-  chooseText: {
-    color: '#cfc5dc',
-    fontSize: 16,
-    marginTop: 18,
-  },
+    buttonText: {
+      color: colors.buttonText,
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
 
-  backText: {
-    color: '#cfc5dc',
-    marginTop: 30,
-    fontSize: 16,
-  },
-});
+    previewImage: {
+      width: 130,
+      height: 130,
+      borderRadius: 12,
+      marginTop: 10,
+    },
+
+    reportButton: {
+      marginTop: 8,
+      padding: 6,
+    },
+
+    reportText: {
+      color: '#f87171',
+      fontSize: 12,
+    },
+
+    chooseText: {
+      color: colors.textSecondary,
+      fontSize: 13,
+      marginTop: 10,
+    },
+
+    backText: {
+      color: colors.textSecondary,
+      marginTop: 14,
+      fontSize: 14,
+    },
+  }));
+}

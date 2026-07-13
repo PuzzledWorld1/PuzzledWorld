@@ -5,6 +5,7 @@ import Svg, {
   Defs,
   Image as SvgImage,
   Path,
+  Rect,
 } from 'react-native-svg';
 
 
@@ -186,6 +187,7 @@ export default function JigsawPiece({
   image,
   size,
   displaySize,
+  letterboxColor = '#0b0f1e',
 }) {
   const row = Math.floor(piece / size);
   const col = piece % size;
@@ -227,13 +229,22 @@ export default function JigsawPiece({
         </ClipPath>
       </Defs>
 
+      <Rect
+        x={0}
+        y={0}
+        width={CELL + 2 * PAD}
+        height={CELL + 2 * PAD}
+        fill={letterboxColor}
+        clipPath={`url(#${clipId})`}
+      />
+
       <SvgImage
         href={image}
         x={imageX}
         y={imageY}
         width={imageSize}
         height={imageSize}
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         clipPath={`url(#${clipId})`}
       />
     </Svg>

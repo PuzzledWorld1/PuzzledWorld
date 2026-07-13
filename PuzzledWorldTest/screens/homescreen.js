@@ -8,6 +8,8 @@ import {
   loadInProgressPuzzle,
   listCompletedPuzzles,
 } from '../lib/puzzleData';
+import ThemeToggle from '../components/ThemeToggle';
+import { withAppFont } from '../constants/typography';
 
 
 export default function HomeScreen({
@@ -17,8 +19,15 @@ export default function HomeScreen({
   setImage,
   setDifficulty,
   setDifficultyLabel,
+  setArtworkTitle,
+  setArtworkArtist,
   setResumeState,
+  colors,
+  themeMode,
+  toggleThemeMode,
 }) {
+  const styles = getStyles(colors);
+
   const [canResume, setCanResume] = useState(false);
   const [completedCount, setCompletedCount] = useState(null);
   const [resuming, setResuming] = useState(false);
@@ -53,6 +62,8 @@ export default function HomeScreen({
       setImage(data.imageDownloadUrl);
       setDifficulty(data.size);
       setDifficultyLabel(data.difficultyLabel);
+      setArtworkTitle(null);
+      setArtworkArtist(null);
 
       setResumeState({
         trayPieces: data.trayPieces,
@@ -69,10 +80,26 @@ export default function HomeScreen({
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>🧩</Text>
-      <Text style={styles.title}>PuzzledWorld</Text>
+      <Text style={styles.title}>Puzzled World</Text>
       <Text style={styles.subtitle}>
-        Turn photos, artwork, and memories into puzzles.
+        Turn photos and artwork into puzzles!
       </Text>
+
+      {canResume && (
+        <Pressable
+          style={styles.resumeButton}
+          onPress={resumePuzzle}
+          disabled={resuming}
+        >
+          <Text style={styles.buttonText}>
+            {resuming ? 'Loading...' : '↻ Resume Puzzle'}
+          </Text>
+        </Pressable>
+      )}
+
+      <Pressable style={styles.button} onPress={() => setScreen('menu')}>
+        <Text style={styles.buttonText}>Get Puzzled</Text>
+      </Pressable>
 
       {!authInitializing && (
         <View style={styles.account}>
@@ -100,45 +127,48 @@ export default function HomeScreen({
         </View>
       )}
 
-      {canResume && (
-        <Pressable
-          style={styles.resumeButton}
-          onPress={resumePuzzle}
-          disabled={resuming}
-        >
-          <Text style={styles.buttonText}>
-            {resuming ? 'Loading...' : '↻ Resume Puzzle'}
-          </Text>
-        </Pressable>
-      )}
-
-      <Pressable style={styles.button} onPress={() => setScreen('menu')}>
-        <Text style={styles.buttonText}>Get Puzzled</Text>
-      </Pressable>
-
       {resuming && (
         <ActivityIndicator
           style={styles.spinner}
-          color="#cfc5dc"
+          color={colors.textSecondary}
         />
       )}
 
-      <StatusBar style="light" />
+      <ThemeToggle
+        themeMode={themeMode}
+        toggleThemeMode={toggleThemeMode}
+      />
+
+      <Text style={styles.disclaimer}>
+        Some artwork (e.g. classical/fine art) or user-submitted images may contain nudity.
+      </Text>
+
+      <StatusBar style={colors.statusBarStyle} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#17111f', alignItems: 'center', justifyContent: 'center', padding: 25 },
-  logo: { fontSize: 70, marginBottom: 10 },
-  title: { fontSize: 34, fontWeight: 'bold', color: 'white', marginBottom: 12 },
-  subtitle: { color: '#cfc5dc', textAlign: 'center', fontSize: 18, marginTop: 10, marginBottom: 24 },
-  account: { alignItems: 'center', marginBottom: 20 },
-  accountText: { color: 'white', fontSize: 15 },
-  accountSubtext: { color: '#cfc5dc', fontSize: 14, marginTop: 4 },
-  linkText: { color: '#a78bfa', fontSize: 15, marginTop: 6, textDecorationLine: 'underline' },
-  button: { backgroundColor: '#8b5cf6', paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 14, width: '100%', alignItems: 'center' },
-  resumeButton: { backgroundColor: '#3b3145', paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 6, width: '100%', alignItems: 'center' },
-  buttonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-  spinner: { marginTop: 14 },
-});
+function getStyles(colors) {
+  return StyleSheet.create(withAppFont({
+    container: { flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 25 },
+    logo: { fontSize: 70, marginBottom: 10 },
+    title: { fontSize: 40, fontWeight: 'bold', color: colors.textPrimary, marginBottom: 12 },
+    subtitle: { color: colors.textSecondary, textAlign: 'center', fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 24 },
+    account: { alignItems: 'center', marginTop: 20, marginBottom: 8 },
+    accountText: { color: colors.textPrimary, fontSize: 15 },
+    accountSubtext: { color: colors.textSecondary, fontSize: 14, marginTop: 4 },
+    linkText: { color: colors.linkText, fontSize: 15, marginTop: 6, textDecorationLine: 'underline' },
+    button: { backgroundColor: colors.buttonPrimary, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 14, width: '100%', alignItems: 'center' },
+    resumeButton: { backgroundColor: colors.resumeButtonBackground, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 6, width: '100%', alignItems: 'center' },
+    buttonText: { color: colors.buttonText, fontSize: 18, fontWeight: 'bold' },
+    spinner: { marginTop: 14 },
+    disclaimer: {
+      color: colors.textSecondary,
+      fontSize: 11,
+      textAlign: 'center',
+      marginTop: 16,
+      paddingHorizontal: 20,
+      opacity: 0.8,
+    },
+  }));
+}

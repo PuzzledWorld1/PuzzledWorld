@@ -25,6 +25,9 @@ import {
   useState,
 } from 'react';
 
+import ThemeToggle from '../components/ThemeToggle';
+import { withAppFont } from '../constants/typography';
+
 
 const MIN_CROP_SIZE = 80;
 const HANDLE_DOT_SIZE = 22;
@@ -54,7 +57,12 @@ export default function CropScreen({
   imageOrientation,
   setImage,
   setScreen,
+  colors,
+  themeMode,
+  toggleThemeMode,
 }) {
+  const styles = getStyles(colors);
+
   const {
     width: windowWidth,
     height: windowHeight,
@@ -805,7 +813,7 @@ export default function CropScreen({
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style={colors.statusBarStyle} />
 
 
       <Text style={styles.title}>
@@ -947,15 +955,21 @@ export default function CropScreen({
           Cancel
         </Text>
       </Pressable>
+
+      <ThemeToggle
+        themeMode={themeMode}
+        toggleThemeMode={toggleThemeMode}
+      />
     </View>
   );
 }
 
 
-const styles = StyleSheet.create({
+function getStyles(colors) {
+  return StyleSheet.create(withAppFont({
   container: {
     flex: 1,
-    backgroundColor: '#17111f',
+    backgroundColor: colors.background,
     alignItems: 'center',
     paddingTop: 55,
     paddingHorizontal: 12,
@@ -964,27 +978,27 @@ const styles = StyleSheet.create({
 
   loading: {
     flex: 1,
-    backgroundColor: '#17111f',
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
 
   loadingText: {
-    color: 'white',
+    color: colors.textPrimary,
     fontSize: 18,
   },
 
 
   title: {
-    color: 'white',
+    color: colors.textPrimary,
     fontSize: 28,
     fontWeight: 'bold',
   },
 
 
   instructions: {
-    color: '#cfc5dc',
+    color: colors.textSecondary,
     fontSize: 15,
     textAlign: 'center',
     marginTop: 8,
@@ -994,7 +1008,7 @@ const styles = StyleSheet.create({
 
   stage: {
     position: 'relative',
-    backgroundColor: '#0e0a13',
+    backgroundColor: colors.boardTrayBackground,
     overflow: 'hidden',
   },
 
@@ -1122,7 +1136,7 @@ const styles = StyleSheet.create({
 
 
   useButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: colors.buttonPrimary,
     paddingVertical: 15,
     borderRadius: 18,
     width: '100%',
@@ -1132,7 +1146,7 @@ const styles = StyleSheet.create({
 
 
   useButtonText: {
-    color: 'white',
+    color: colors.buttonText,
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -1144,7 +1158,8 @@ const styles = StyleSheet.create({
 
 
   cancelText: {
-    color: '#cfc5dc',
+    color: colors.textSecondary,
     fontSize: 16,
   },
-});
+  }));
+}

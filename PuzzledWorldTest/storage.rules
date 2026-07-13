@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Every user's own resume-slot photo.
+    match /users/{uid}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Pre-moderation upload for a shared puzzle. Only the uploader can
+    // write here, and NOBODY can read it directly - only the
+    // moderateAndPublishSharedPuzzle Cloud Function (Admin SDK, which
+    // bypasses these rules) ever reads a staged image, to run it through
+    // SafeSearch/CSAI Match before anything becomes public.
+    match /sharedStaging/{shareId} {
+      allow write: if request.auth != null;
+      allow read: if false;
+    }
+
+    // Published shared-puzzle images. Only the Cloud Function writes
+    // here (after moderation passes) - clients can read, never write.
+    match /shared/{shareId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Reported images - anyone (including guests) can file one, matching
+    // the Firestore reports/ collection this pairs with. Nobody can read
+    // it back from the client; only manual review via the Admin SDK.
+    match /reports/{reportId} {
+      allow write: if true;
+      allow read: if false;
+    }
+  }
+}
