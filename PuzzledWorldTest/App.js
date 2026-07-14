@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Linking, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
+import mobileAds from 'react-native-google-mobile-ads';
 import HomeScreen from './screens/homescreen';
 import MenuScreen from './screens/menuscreen';
 import GalleryScreen from './screens/galleryscreen';
@@ -202,6 +203,10 @@ export default function App() {
 
   useEffect(() => {
     loadThemeMode().then(setThemeMode);
+  }, []);
+
+  useEffect(() => {
+    mobileAds().initialize();
   }, []);
 
   const toggleThemeMode = () => {

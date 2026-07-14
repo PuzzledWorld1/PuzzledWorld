@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 import { deleteAccount, signOutUser } from '../lib/auth';
 import {
@@ -10,6 +11,13 @@ import {
 } from '../lib/puzzleData';
 import ThemeToggle from '../components/ThemeToggle';
 import { withAppFont } from '../constants/typography';
+
+
+// Real ads only serve outside dev, so testing never risks clicking a live
+// ad and getting the AdMob account flagged for invalid traffic.
+const BANNER_AD_UNIT_ID = __DEV__
+  ? TestIds.BANNER
+  : 'ca-app-pub-7328298342514333/2603036622';
 
 
 export default function HomeScreen({
@@ -159,15 +167,6 @@ export default function HomeScreen({
               <Pressable onPress={signOutUser}>
                 <Text style={styles.linkText}>Sign Out</Text>
               </Pressable>
-
-              <Pressable
-                onPress={confirmDeleteAccount}
-                disabled={deleting}
-              >
-                <Text style={styles.deleteText}>
-                  {deleting ? 'Deleting…' : 'Delete my account'}
-                </Text>
-              </Pressable>
             </>
           ) : (
             <Pressable onPress={() => setScreen('auth')}>
@@ -193,6 +192,25 @@ export default function HomeScreen({
         Some artwork (e.g. classical/fine art) or user-submitted images may contain nudity.
       </Text>
 
+      {user && (
+        <Pressable
+          style={styles.deleteAccountCorner}
+          onPress={confirmDeleteAccount}
+          disabled={deleting}
+        >
+          <Text style={styles.deleteText}>
+            {deleting ? 'Deleting…' : 'Delete my account'}
+          </Text>
+        </Pressable>
+      )}
+
+      <View style={styles.bannerDock}>
+        <BannerAd
+          unitId={BANNER_AD_UNIT_ID}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        />
+      </View>
+
       <StatusBar style={colors.statusBarStyle} />
     </View>
   );
@@ -208,7 +226,9 @@ function getStyles(colors) {
     accountText: { color: colors.textPrimary, fontSize: 15 },
     accountSubtext: { color: colors.textSecondary, fontSize: 14, marginTop: 4 },
     linkText: { color: colors.linkText, fontSize: 15, marginTop: 6, textDecorationLine: 'underline' },
-    deleteText: { color: '#dc2626', fontSize: 12, marginTop: 10, textDecorationLine: 'underline', opacity: 0.8 },
+    deleteText: { color: '#dc2626', fontSize: 12, textDecorationLine: 'underline', opacity: 0.8 },
+    deleteAccountCorner: { position: 'absolute', left: 16, bottom: 90 },
+    bannerDock: { position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center' },
     button: { backgroundColor: colors.buttonPrimary, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 14, width: '100%', alignItems: 'center' },
     resumeButton: { backgroundColor: colors.resumeButtonBackground, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 6, width: '100%', alignItems: 'center' },
     buttonText: { color: colors.buttonText, fontSize: 18, fontWeight: 'bold' },

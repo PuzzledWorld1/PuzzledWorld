@@ -31,6 +31,12 @@ import {
   StatusBar,
 } from 'expo-status-bar';
 
+import {
+  AdEventType,
+  InterstitialAd,
+  TestIds,
+} from 'react-native-google-mobile-ads';
+
 import JigsawPiece, {
   PIECE_BOX_SCALE,
   PIECE_PADDING_RATIO,
@@ -696,6 +702,13 @@ function PieceGroup({
 }
 
 
+// Real ads only serve outside dev, so testing never risks clicking a live
+// ad and getting the AdMob account flagged for invalid traffic.
+const INTERSTITIAL_AD_UNIT_ID = __DEV__
+  ? TestIds.INTERSTITIAL
+  : 'ca-app-pub-7328298342514333/9488577395';
+
+
 export default function PuzzleScreen({
   image,
   setScreen,
@@ -824,6 +837,25 @@ export default function PuzzleScreen({
 
   const startTimeRef =
     useRef(Date.now());
+
+  const interstitialRef = useRef(
+    InterstitialAd.createForAdRequest(INTERSTITIAL_AD_UNIT_ID)
+  );
+
+  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
+
+  useEffect(() => {
+    const interstitial = interstitialRef.current;
+
+    const unsubscribe = interstitial.addAdEventListener(
+      AdEventType.LOADED,
+      () => setInterstitialLoaded(true)
+    );
+
+    interstitial.load();
+
+    return unsubscribe;
+  }, []);
 
 
   const floatX =
@@ -1796,6 +1828,12 @@ export default function PuzzleScreen({
       );
     }
   }, [isSolved]);
+
+  useEffect(() => {
+    if (isSolved && interstitialLoaded) {
+      interstitialRef.current.show();
+    }
+  }, [isSolved, interstitialLoaded]);
 
 
   return (
