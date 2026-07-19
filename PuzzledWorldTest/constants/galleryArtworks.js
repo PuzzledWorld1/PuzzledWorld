@@ -327,18 +327,6 @@ export const GALLERY_ARTWORKS = [
   },
 
   {
-    id: 'cassatt-the-coiffure',
-    title: 'The Coiffure',
-    artist: 'Mary Cassatt',
-    year: '1890-1891',
-    localImage: require('../assets/gallery/cassatt-the-coiffure.jpg'),
-    remoteUrl: commonsUrl(
-      'Mary Cassatt, The Coiffure, 1890-1891, NGA 5920.jpg',
-      1400
-    ),
-  },
-
-  {
     id: 'homer-mending-nets',
     title: 'Mending Nets',
     artist: 'Winslow Homer',
@@ -423,38 +411,1107 @@ export const GALLERY_ARTWORKS = [
   },
 
   {
-    id: 'raphael-alba-madonna',
-    title: 'The Alba Madonna',
+    id: 'constable-salisbury-cathedral',
+    title: 'Salisbury Cathedral from Lower Marsh Close',
+    artist: 'John Constable',
+    year: '1820',
+    localImage: require('../assets/gallery/constable-salisbury-cathedral.jpg'),
+    remoteUrl: commonsUrl(
+      'John Constable, Salisbury Cathedral from Lower Marsh Close, 1820, NGA 115.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'constable-white-horse',
+    title: 'The White Horse',
+    artist: 'John Constable',
+    year: '1818-1819',
+    localImage: require('../assets/gallery/constable-white-horse.jpg'),
+    remoteUrl: commonsUrl(
+      'John Constable, The White Horse, 1818-1819, NGA 1146.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'constable-cloud-study',
+    title: 'Cloud Study - Stormy Sunset',
+    artist: 'John Constable',
+    year: '1821-1822',
+    localImage: require('../assets/gallery/constable-cloud-study.jpg'),
+    remoteUrl: commonsUrl(
+      'John Constable, Cloud Study - Stormy Sunset, 1821-1822, NGA 104243.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-view-near-volterra',
+    title: 'A View near Volterra',
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: '1838',
+    localImage: require('../assets/gallery/corot-view-near-volterra.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean-Baptiste-Camille Corot, A View near Volterra, 1838, NGA 46586.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-beach-near-etretat',
+    title: 'Beach near Etretat',
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: 'c. 1872',
+    localImage: require('../assets/gallery/corot-beach-near-etretat.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean-Baptiste-Camille Corot, Beach near Etretat, c. 1872, NGA 52261.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-bridge-saone-macon',
+    title: 'Bridge on the Saône River at Mâcon',
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: '1834',
+    localImage: require('../assets/gallery/corot-bridge-saone-macon.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean-Baptiste-Camille Corot, Bridge on the Saône River at Mâcon, 1834, NGA 52166.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-ville-d-avray',
+    title: "Ville-d'Avray",
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: 'c. 1865',
+    localImage: require('../assets/gallery/corot-ville-d-avray.jpg'),
+    remoteUrl: commonsUrl(
+      "Jean-Baptiste-Camille Corot, Ville-d'Avray, c. 1865, NGA 43430.jpg",
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-forest-of-coubron',
+    title: 'The Forest of Coubron',
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: '1872',
+    localImage: require('../assets/gallery/corot-forest-of-coubron.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean-Baptiste-Camille Corot, The Forest of Coubron, 1872, NGA 1149.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-italian-peasant-boy',
+    title: 'Italian Peasant Boy',
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: '1825-1827',
+    localImage: require('../assets/gallery/corot-italian-peasant-boy.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean-Baptiste-Camille Corot, Italian Peasant Boy, 1825-1827, NGA 46483.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'corot-madame-stumpf',
+    title: 'Madame Stumpf and Her Daughter',
+    artist: 'Jean-Baptiste-Camille Corot',
+    year: '1872',
+    localImage: require('../assets/gallery/corot-madame-stumpf.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean-Baptiste-Camille Corot, Madame Stumpf and Her Daughter, 1872, NGA 52167.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'sisley-boulevard-heloise',
+    title: 'Boulevard Héloïse, Argenteuil',
+    artist: 'Alfred Sisley',
+    year: '1872',
+    localImage: require('../assets/gallery/sisley-boulevard-heloise.jpg'),
+    remoteUrl: commonsUrl(
+      'Alfred Sisley, Boulevard Héloïse, Argenteuil, 1872, NGA 52226.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'sisley-first-snow-veneux',
+    title: 'First Snow at Veneux-Nadon',
+    artist: 'Alfred Sisley',
+    year: '1878',
+    localImage: require('../assets/gallery/sisley-first-snow-veneux.jpg'),
+    remoteUrl: commonsUrl(
+      'Alfred Sisley, First Snow at Veneux-Nadon, 1878, NGA 62641.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'sisley-flood-port-marly',
+    title: 'Flood at Port-Marly',
+    artist: 'Alfred Sisley',
+    year: '1872',
+    localImage: require('../assets/gallery/sisley-flood-port-marly.jpg'),
+    remoteUrl: commonsUrl(
+      'Alfred Sisley, Flood at Port-Marly, 1872, NGA 66436.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'sisley-marly-le-roi',
+    title: 'Marly-le-Roi',
+    artist: 'Alfred Sisley',
+    year: 'c. 1875',
+    localImage: require('../assets/gallery/sisley-marly-le-roi.jpg'),
+    remoteUrl: commonsUrl(
+      'Alfred Sisley, Marly-le-Roi, c. 1875, NGA 177090.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chardin-fruit-jug-glass',
+    title: 'Fruit, Jug, and a Glass',
+    artist: 'Jean Siméon Chardin',
+    year: 'c. 1726-1728',
+    localImage: require('../assets/gallery/chardin-fruit-jug-glass.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean Siméon Chardin, Fruit, Jug, and a Glass, c. 1726-1728, NGA 12202.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chardin-soap-bubbles',
+    title: 'Soap Bubbles',
+    artist: 'Jean Siméon Chardin',
+    year: 'probably 1733-1734',
+    localImage: require('../assets/gallery/chardin-soap-bubbles.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean Siméon Chardin, Soap Bubbles, probably 1733-1734, NGA 994.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chardin-white-mug',
+    title: 'Still Life with a White Mug',
+    artist: 'Jean Siméon Chardin',
+    year: 'c. 1764',
+    localImage: require('../assets/gallery/chardin-white-mug.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean Siméon Chardin, Still Life with a White Mug, c. 1764, NGA 53124.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chardin-house-of-cards',
+    title: 'The House of Cards',
+    artist: 'Jean Siméon Chardin',
+    year: 'probably 1737',
+    localImage: require('../assets/gallery/chardin-house-of-cards.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean Siméon Chardin, The House of Cards, probably 1737, NGA 97.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chardin-kitchen-maid',
+    title: 'The Kitchen Maid',
+    artist: 'Jean Siméon Chardin',
+    year: '1738',
+    localImage: require('../assets/gallery/chardin-kitchen-maid.jpg'),
+    remoteUrl: commonsUrl(
+      'Jean Siméon Chardin, The Kitchen Maid, 1738, NGA 41650.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bellows-anne-japanese-parasol',
+    title: 'Anne with a Japanese Parasol',
+    artist: 'George Bellows',
+    year: '1917',
+    localImage: require('../assets/gallery/bellows-anne-japanese-parasol.jpg'),
+    remoteUrl: commonsUrl(
+      'George Bellows, Anne with a Japanese Parasol, 1917, NGA 61351.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bellows-blue-morning',
+    title: 'Blue Morning',
+    artist: 'George Bellows',
+    year: '1909',
+    localImage: require('../assets/gallery/bellows-blue-morning.jpg'),
+    remoteUrl: commonsUrl(
+      'George Bellows, Blue Morning, 1909, NGA 46557.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bellows-chester-dale',
+    title: 'Chester Dale',
+    artist: 'George Bellows',
+    year: '1922',
+    localImage: require('../assets/gallery/bellows-chester-dale.jpg'),
+    remoteUrl: commonsUrl(
+      'George Bellows, Chester Dale, 1922, NGA 30743.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bellows-my-family',
+    title: 'My Family',
+    artist: 'George Bellows',
+    year: '1916',
+    localImage: require('../assets/gallery/bellows-my-family.jpg'),
+    remoteUrl: commonsUrl(
+      'George Bellows, My Family, 1916, NGA 61353.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bellows-new-york',
+    title: 'New York',
+    artist: 'George Bellows',
+    year: '1911',
+    localImage: require('../assets/gallery/bellows-new-york.jpg'),
+    remoteUrl: commonsUrl(
+      'George Bellows, New York, 1911, NGA 69392.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bellows-lone-tenement',
+    title: 'The Lone Tenement',
+    artist: 'George Bellows',
+    year: '1909',
+    localImage: require('../assets/gallery/bellows-lone-tenement.jpg'),
+    remoteUrl: commonsUrl(
+      'George Bellows, The Lone Tenement, 1909, NGA 46558.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'turner-approach-to-venice',
+    title: 'Approach to Venice',
+    artist: 'J.M.W. Turner',
+    year: '1844',
+    localImage: require('../assets/gallery/turner-approach-to-venice.jpg'),
+    remoteUrl: commonsUrl(
+      'Joseph Mallord William Turner, Approach to Venice, 1844, NGA 117.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'turner-rotterdam-ferry-boat',
+    title: 'Rotterdam Ferry-Boat',
+    artist: 'J.M.W. Turner',
+    year: '1833',
+    localImage: require('../assets/gallery/turner-rotterdam-ferry-boat.jpg'),
+    remoteUrl: commonsUrl(
+      'Joseph Mallord William Turner, Rotterdam Ferry-Boat, 1833, NGA 52279.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'turner-dogana-santa-maria',
+    title: 'The Dogana and Santa Maria della Salute, Venice',
+    artist: 'J.M.W. Turner',
+    year: '1843',
+    localImage: require('../assets/gallery/turner-dogana-santa-maria.jpg'),
+    remoteUrl: commonsUrl(
+      'Joseph Mallord William Turner, The Dogana and Santa Maria della Salute, Venice, 1843, NGA 46089.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'turner-junction-thames-medway',
+    title: 'The Junction of the Thames and the Medway',
+    artist: 'J.M.W. Turner',
+    year: '1807',
+    localImage: require('../assets/gallery/turner-junction-thames-medway.jpg'),
+    remoteUrl: commonsUrl(
+      'Joseph Mallord William Turner, The Junction of the Thames and the Medway, 1807, NGA 1226.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'copley-abigail-babcock',
+    title: 'Abigail Smith Babcock (Mrs. Adam Babcock)',
+    artist: 'John Singleton Copley',
+    year: 'c. 1774',
+    localImage: require('../assets/gallery/copley-abigail-babcock.jpg'),
+    remoteUrl: commonsUrl(
+      'John Singleton Copley, Abigail Smith Babcock (Mrs. Adam Babcock), c. 1774, NGA 65885.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'copley-fitch-family',
+    title: 'Colonel William Fitch and His Sisters Sarah and Ann Fitch',
+    artist: 'John Singleton Copley',
+    year: '1800-1801',
+    localImage: require('../assets/gallery/copley-fitch-family.jpg'),
+    remoteUrl: commonsUrl(
+      'John Singleton Copley, Colonel William Fitch and His Sisters Sarah and Ann Fitch, 1800-1801, NGA 46008.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'copley-elizabeth-otis',
+    title: 'Elizabeth Gray Otis (Mrs. Samuel Alleyne Otis)',
+    artist: 'John Singleton Copley',
+    year: 'c. 1764',
+    localImage: require('../assets/gallery/copley-elizabeth-otis.jpg'),
+    remoteUrl: commonsUrl(
+      'John Singleton Copley, Elizabeth Gray Otis (Mrs. Samuel Alleyne Otis), c. 1764, NGA 57541.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'copley-epes-sargent',
+    title: 'Epes Sargent',
+    artist: 'John Singleton Copley',
+    year: 'c. 1760',
+    localImage: require('../assets/gallery/copley-epes-sargent.jpg'),
+    remoteUrl: commonsUrl(
+      'John Singleton Copley, Epes Sargent, c. 1760, NGA 45881.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'copley-family',
+    title: 'The Copley Family',
+    artist: 'John Singleton Copley',
+    year: '1776-1777',
+    localImage: require('../assets/gallery/copley-family.jpg'),
+    remoteUrl: commonsUrl(
+      'John Singleton Copley, The Copley Family, 1776-1777, NGA 46098.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cropsey-tourn-mountain',
+    title: 'Tourn Mountain, Head Quarters of Washington, Rockland Co., New York',
+    artist: 'Jasper Francis Cropsey',
+    year: '1851',
+    localImage: require('../assets/gallery/cropsey-tourn-mountain.jpg'),
+    remoteUrl: commonsUrl(
+      'Jasper Francis Cropsey, Tourn Mountain, Head Quarters of Washington, Rockland Co., New York, 1851, NGA 177779.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cropsey-warwick-castle',
+    title: 'Warwick Castle, England',
+    artist: 'Jasper Francis Cropsey',
+    year: '1857',
+    localImage: require('../assets/gallery/cropsey-warwick-castle.jpg'),
+    remoteUrl: commonsUrl(
+      'Jasper Francis Cropsey, Warwick Castle, England, 1857, NGA 73436.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cuyp-herdsmen-tending-cattle',
+    title: 'Herdsmen Tending Cattle',
+    artist: 'Aelbert Cuyp',
+    year: '1655-1660',
+    localImage: require('../assets/gallery/cuyp-herdsmen-tending-cattle.jpg'),
+    remoteUrl: commonsUrl(
+      'Aelbert Cuyp, Herdsmen Tending Cattle, 1655-1660, NGA 66.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cuyp-horsemen-herdsmen-cattle',
+    title: 'Horsemen and Herdsmen with Cattle',
+    artist: 'Aelbert Cuyp',
+    year: '1655-1660',
+    localImage: require('../assets/gallery/cuyp-horsemen-herdsmen-cattle.jpg'),
+    remoteUrl: commonsUrl(
+      'Aelbert Cuyp, Horsemen and Herdsmen with Cattle, 1655-1660, NGA 1153.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cuyp-river-landscape-cows',
+    title: 'River Landscape with Cows',
+    artist: 'Aelbert Cuyp',
+    year: '1645-1650',
+    localImage: require('../assets/gallery/cuyp-river-landscape-cows.jpg'),
+    remoteUrl: commonsUrl(
+      'Aelbert Cuyp, River Landscape with Cows, 1645-1650, NGA 69390.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cuyp-lady-gentleman-horseback',
+    title: 'Lady and Gentleman on Horseback',
+    artist: 'Aelbert Cuyp',
+    year: 'c. 1655',
+    localImage: require('../assets/gallery/cuyp-lady-gentleman-horseback.jpg'),
+    remoteUrl: commonsUrl(
+      'Aelbert Cuyp, Lady and Gentleman on Horseback, c. 1655, reworked 1660-1665, NGA 1152.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cuyp-pier-dordrecht',
+    title: 'A Pier Overlooking Dordrecht',
+    artist: 'Aelbert Cuyp',
+    year: 'early 1640s',
+    localImage: require('../assets/gallery/cuyp-pier-dordrecht.jpg'),
+    remoteUrl: commonsUrl(
+      'Aelbert Cuyp, A Pier Overlooking Dordrecht, early 1640s, NGA 100922.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'boudin-beach-at-trouville',
+    title: 'Beach at Trouville',
+    artist: 'Eugène Boudin',
+    year: '1864-1865',
+    localImage: require('../assets/gallery/boudin-beach-at-trouville.jpg'),
+    remoteUrl: commonsUrl(
+      'Eugène Boudin, Beach at Trouville, 1864-1865, NGA 52156.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'boudin-women-beach-berck',
+    title: 'Women on the Beach at Berck',
+    artist: 'Eugène Boudin',
+    year: '1881',
+    localImage: require('../assets/gallery/boudin-women-beach-berck.jpg'),
+    remoteUrl: commonsUrl(
+      'Eugène Boudin, Women on the Beach at Berck, 1881, NGA 52159.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'boudin-on-the-beach-trouville',
+    title: 'On the Beach, Trouville',
+    artist: 'Eugène Boudin',
+    year: '1887',
+    localImage: require('../assets/gallery/boudin-on-the-beach-trouville.jpg'),
+    remoteUrl: commonsUrl(
+      'Eugène Boudin, On the Beach, Trouville, 1887, NGA 46480.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'boudin-the-beach',
+    title: 'The Beach',
+    artist: 'Eugène Boudin',
+    year: '1877',
+    localImage: require('../assets/gallery/boudin-the-beach.jpg'),
+    remoteUrl: commonsUrl(
+      'Eugène Boudin, The Beach, 1877, NGA 52158.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'boudin-concert-casino-deauville',
+    title: 'Concert at the Casino of Deauville',
+    artist: 'Eugène Boudin',
+    year: '1865',
+    localImage: require('../assets/gallery/boudin-concert-casino-deauville.jpg'),
+    remoteUrl: commonsUrl(
+      'Eugène Boudin, Concert at the Casino of Deauville, 1865, NGA 66401.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'boudin-festival-harbor-honfleur',
+    title: 'Festival in the Harbor of Honfleur',
+    artist: 'Eugène Boudin',
+    year: '1858',
+    localImage: require('../assets/gallery/boudin-festival-harbor-honfleur.jpg'),
+    remoteUrl: commonsUrl(
+      'Eugène Boudin, Festival in the Harbor of Honfleur, 1858, NGA 61360.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bazille-edmond-maitre',
+    title: 'Edmond Maître',
+    artist: 'Frédéric Bazille',
+    year: '1869',
+    localImage: require('../assets/gallery/bazille-edmond-maitre.jpg'),
+    remoteUrl: commonsUrl(
+      'Frédéric Bazille, Edmond Maître, 1869, NGA 66400.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'bazille-western-ramparts-aigues-mortes',
+    title: 'The Western Ramparts at Aigues-Mortes',
+    artist: 'Frédéric Bazille',
+    year: '1867',
+    localImage: require('../assets/gallery/bazille-western-ramparts-aigues-mortes.jpg'),
+    remoteUrl: commonsUrl(
+      'Frédéric Bazille, The Western Ramparts at Aigues-Mortes, 1867, NGA 66399.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chase-english-cod',
+    title: 'An English Cod',
+    artist: 'William Merritt Chase',
+    year: '1904',
+    localImage: require('../assets/gallery/chase-english-cod.jpg'),
+    remoteUrl: commonsUrl(
+      'William Merritt Chase, An English Cod, 1904, NGA 195635.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chase-gathering-autumn-flowers',
+    title: 'Gathering Autumn Flowers',
+    artist: 'William Merritt Chase',
+    year: '1894-1895',
+    localImage: require('../assets/gallery/chase-gathering-autumn-flowers.jpg'),
+    remoteUrl: commonsUrl(
+      'William Merritt Chase, Gathering Autumn Flowers, 1894-1895, NGA 157922.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'chase-self-portrait',
+    title: 'Self-Portrait',
+    artist: 'William Merritt Chase',
+    year: '1915',
+    localImage: require('../assets/gallery/chase-self-portrait.jpg'),
+    remoteUrl: commonsUrl(
+      'William Merritt Chase, Self-Portrait, 1915, NGA 195727.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-home-sweet-home',
+    title: 'Home, Sweet Home',
+    artist: 'Winslow Homer',
+    year: 'c. 1863',
+    localImage: require('../assets/gallery/homer-home-sweet-home.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Home, Sweet Home, c. 1863, NGA 79933.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-native-hut-nassau',
+    title: 'Native Hut at Nassau',
+    artist: 'Winslow Homer',
+    year: '1885',
+    localImage: require('../assets/gallery/homer-native-hut-nassau.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Native hut at Nassau, 1885, NGA 89670.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-incoming-tide-scarboro',
+    title: 'Incoming Tide, Scarboro, Maine',
+    artist: 'Winslow Homer',
+    year: '1883',
+    localImage: require('../assets/gallery/homer-incoming-tide-scarboro.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Incoming Tide, Scarboro, Maine, 1883, NGA 55583.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-sketch-cottage-yard',
+    title: 'Sketch of a Cottage Yard',
+    artist: 'Winslow Homer',
+    year: 'c. 1876',
+    localImage: require('../assets/gallery/homer-sketch-cottage-yard.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Sketch of a Cottage Yard, c. 1876, NGA 166455.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-view-santiago-de-cuba',
+    title: 'View of Santiago de Cuba',
+    artist: 'Winslow Homer',
+    year: '1885',
+    localImage: require('../assets/gallery/homer-view-santiago-de-cuba.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, View of Santiago de Cuba, 1885, NGA 64553.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-dads-coming',
+    title: "Dad's Coming!",
+    artist: 'Winslow Homer',
+    year: '1873',
+    localImage: require('../assets/gallery/homer-dads-coming.jpg'),
+    remoteUrl: commonsUrl(
+      "Winslow Homer, Dad's Coming!, 1873, NGA 79891.jpg",
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-dinner-horn',
+    title: 'The Dinner Horn (Blowing the Horn at Seaside)',
+    artist: 'Winslow Homer',
+    year: '1870',
+    localImage: require('../assets/gallery/homer-dinner-horn.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, The Dinner Horn (Blowing the Horn at Seaside), 1870, NGA 89664.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-right-and-left',
+    title: 'Right and Left',
+    artist: 'Winslow Homer',
+    year: '1909',
+    localImage: require('../assets/gallery/homer-right-and-left.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Right and Left, 1909, NGA 39763.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-east-hampton-beach',
+    title: 'East Hampton Beach, Long Island',
+    artist: 'Winslow Homer',
+    year: '1874',
+    localImage: require('../assets/gallery/homer-east-hampton-beach.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, East Hampton Beach, Long Island, 1874, NGA 157923.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-the-flirt',
+    title: 'The Flirt',
+    artist: 'Winslow Homer',
+    year: '1874',
+    localImage: require('../assets/gallery/homer-the-flirt.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, The Flirt, 1874, NGA 164928.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-light-on-the-sea',
+    title: 'A Light on the Sea',
+    artist: 'Winslow Homer',
+    year: '1897',
+    localImage: require('../assets/gallery/homer-light-on-the-sea.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, A Light on the Sea, 1897, NGA 166501.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-sunset-1875',
+    title: 'Sunset',
+    artist: 'Winslow Homer',
+    year: 'c. 1875',
+    localImage: require('../assets/gallery/homer-sunset-1875.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Sunset, c. 1875, NGA 47184.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-red-school-house',
+    title: 'The Red School House',
+    artist: 'Winslow Homer',
+    year: '1873',
+    localImage: require('../assets/gallery/homer-red-school-house.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, The Red School House, 1873, NGA 66419.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-autumn-1877',
+    title: 'Autumn',
+    artist: 'Winslow Homer',
+    year: '1877',
+    localImage: require('../assets/gallery/homer-autumn-1877.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, Autumn, 1877, NGA 66420.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'homer-school-time',
+    title: 'School Time',
+    artist: 'Winslow Homer',
+    year: 'c. 1874',
+    localImage: require('../assets/gallery/homer-school-time.jpg'),
+    remoteUrl: commonsUrl(
+      'Winslow Homer, School Time, c. 1874, NGA 164929.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'whistler-white-girl',
+    title: 'Symphony in White, No. 1: The White Girl',
+    artist: 'James McNeill Whistler',
+    year: '1862',
+    localImage: require('../assets/gallery/whistler-white-girl.jpg'),
+    remoteUrl: commonsUrl(
+      'Whistler_James_Symphony_in_White_no_1_(The_White_Girl)_1862.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'manet-old-musician',
+    title: 'The Old Musician',
+    artist: 'Édouard Manet',
+    year: '1862',
+    localImage: require('../assets/gallery/manet-old-musician.jpg'),
+    remoteUrl: commonsUrl(
+      'Édouard Manet - Le Vieux Musicien.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cassatt-boating-party',
+    title: 'The Boating Party',
+    artist: 'Mary Cassatt',
+    year: '1893-1894',
+    localImage: require('../assets/gallery/cassatt-boating-party.jpg'),
+    remoteUrl: commonsUrl(
+      'Mary Cassatt, The Boating Party, 1893-1894, NGA 46569.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-the-mill',
+    title: 'The Mill',
+    artist: 'Rembrandt van Rijn',
+    year: '1645-1648',
+    localImage: require('../assets/gallery/rembrandt-the-mill.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, The Mill, 1645-1648, NGA 1201.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'hopper-ground-swell',
+    title: 'Ground Swell',
+    artist: 'Edward Hopper',
+    year: '1939',
+    localImage: require('../assets/gallery/hopper-ground-swell.jpg'),
+    remoteUrl: commonsUrl(
+      'Ground swell 2014.79.23.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'el-greco-saint-ildefonso',
+    title: 'Saint Ildefonso',
+    artist: 'El Greco',
+    year: 'c. 1603-1614',
+    localImage: require('../assets/gallery/el-greco-saint-ildefonso.jpg'),
+    remoteUrl: commonsUrl(
+      'El Greco (Domenikos Theotokopoulos), Saint Ildefonso, c. 1603-1614, NGA 90.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'vermeer-lady-writing',
+    title: 'A Lady Writing',
+    artist: 'Johannes Vermeer',
+    year: 'c. 1665',
+    localImage: require('../assets/gallery/vermeer-lady-writing.jpg'),
+    remoteUrl: commonsUrl(
+      'Johannes Vermeer, A Lady Writing, c. 1665, NGA 46437.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'raphael-saint-george-dragon',
+    title: 'Saint George and the Dragon',
     artist: 'Raphael',
-    year: 'c. 1510',
-    localImage: require('../assets/gallery/raphael-alba-madonna.jpg'),
+    year: 'c. 1506',
+    localImage: require('../assets/gallery/raphael-saint-george-dragon.jpg'),
     remoteUrl: commonsUrl(
-      'Raphael, The Alba Madonna, c. 1510, NGA 26.jpg',
+      'Raphael - Saint George and the Dragon.jpg',
       1400
     ),
   },
 
   {
-    id: 'titian-venus-with-a-mirror',
-    title: 'Venus with a Mirror',
+    id: 'van-gogh-green-wheat-fields',
+    title: 'Green Wheat Fields, Auvers',
+    artist: 'Vincent van Gogh',
+    year: '1890',
+    localImage: require('../assets/gallery/van-gogh-green-wheat-fields.jpg'),
+    remoteUrl: commonsUrl(
+      'Vincent van Gogh, Green Wheat Fields, Auvers, 1890, NGA 163323.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'van-gogh-olive-orchard',
+    title: 'The Olive Orchard',
+    artist: 'Vincent van Gogh',
+    year: '1889',
+    localImage: require('../assets/gallery/van-gogh-olive-orchard.jpg'),
+    remoteUrl: commonsUrl(
+      'Vincent van Gogh, The Olive Orchard, 1889, NGA 46627.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'van-gogh-girl-in-white',
+    title: 'Girl in White',
+    artist: 'Vincent van Gogh',
+    year: '1890',
+    localImage: require('../assets/gallery/van-gogh-girl-in-white.jpg'),
+    remoteUrl: commonsUrl(
+      'Vincent van Gogh, Girl in White, 1890, NGA 46505.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'van-gogh-roulins-baby',
+    title: "Roulin's Baby",
+    artist: 'Vincent van Gogh',
+    year: '1888',
+    localImage: require('../assets/gallery/van-gogh-roulins-baby.jpg'),
+    remoteUrl: commonsUrl(
+      "Vincent van Gogh, Roulin's Baby, 1888, NGA 46506.jpg",
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-woman-holding-pink',
+    title: 'A Woman Holding a Pink',
+    artist: 'Rembrandt van Rijn',
+    year: '1656',
+    localImage: require('../assets/gallery/rembrandt-woman-holding-pink.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, A Woman Holding a Pink, 1656, NGA 82.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-young-man-seated',
+    title: 'A Young Man Seated at a Table (possibly Govaert Flinck)',
+    artist: 'Rembrandt van Rijn',
+    year: 'c. 1660',
+    localImage: require('../assets/gallery/rembrandt-young-man-seated.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, A Young Man Seated at a Table (possibly Govaert Flinck), c. 1660, NGA 84.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-man-sheet-music',
+    title: 'Man with a Sheet of Music',
+    artist: 'Rembrandt van Rijn',
+    year: '1633',
+    localImage: require('../assets/gallery/rembrandt-man-sheet-music.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, Man with a Sheet of Music, 1633, NGA 177795.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-philemon-baucis',
+    title: 'Philemon and Baucis',
+    artist: 'Rembrandt van Rijn',
+    year: '1658',
+    localImage: require('../assets/gallery/rembrandt-philemon-baucis.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, Philemon and Baucis, 1658, NGA 1204.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-gentleman-tall-hat',
+    title: 'Portrait of a Gentleman with a Tall Hat and Gloves',
+    artist: 'Rembrandt van Rijn',
+    year: 'c. 1656-1658',
+    localImage: require('../assets/gallery/rembrandt-gentleman-tall-hat.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, Portrait of a Gentleman with a Tall Hat and Gloves, c. 1656-1658, NGA 1206.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-lady-ostrich-fan',
+    title: 'Portrait of a Lady with an Ostrich-Feather Fan',
+    artist: 'Rembrandt van Rijn',
+    year: 'c. 1656-1658',
+    localImage: require('../assets/gallery/rembrandt-lady-ostrich-fan.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, Portrait of a Lady with an Ostrich-Feather Fan, c. 1656-1658, NGA 1207.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'rembrandt-man-tall-hat',
+    title: 'Portrait of a Man in a Tall Hat',
+    artist: 'Rembrandt van Rijn',
+    year: 'c. 1663',
+    localImage: require('../assets/gallery/rembrandt-man-tall-hat.jpg'),
+    remoteUrl: commonsUrl(
+      'Rembrandt van Rijn, Portrait of a Man in a Tall Hat, c. 1663, NGA 1208.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'titian-emilia-di-spilimbergo',
+    title: 'Emilia di Spilimbergo',
     artist: 'Titian',
-    year: 'c. 1555',
-    localImage: require('../assets/gallery/titian-venus-with-a-mirror.jpg'),
+    year: 'n.d.',
+    localImage: require('../assets/gallery/titian-emilia-di-spilimbergo.jpg'),
     remoteUrl: commonsUrl(
-      'Titian - Venus with a Mirror - Google Art Project.jpg',
+      'Emilia_di_spilimbergo_1942.9.82.jpg',
       1400
     ),
   },
 
   {
-    id: 'botticelli-adoration-of-the-magi',
-    title: 'The Adoration of the Magi',
-    artist: 'Sandro Botticelli',
-    year: 'c. 1478-1482',
-    localImage: require('../assets/gallery/botticelli-adoration-of-the-magi.jpg'),
+    id: 'titian-woman-holding-apple',
+    title: 'Woman Holding an Apple',
+    artist: 'Titian',
+    year: 'n.d.',
+    localImage: require('../assets/gallery/titian-woman-holding-apple.jpg'),
     remoteUrl: commonsUrl(
-      'Sandro Botticelli, The Adoration of the Magi, c. 1478-1482, NGA 24.jpg',
+      'Titian - Woman Holding an Apple.jpg',
       1400
     ),
   },
+
+  {
+    id: 'monet-woman-with-a-parasol',
+    title: 'Woman with a Parasol - Madame Monet and Her Son',
+    artist: 'Claude Monet',
+    year: '1875',
+    localImage: require('../assets/gallery/monet-woman-with-a-parasol.jpg'),
+    remoteUrl: commonsUrl(
+      'Claude Monet - Woman with a Parasol - Madame Monet and Her Son - Google Art Project.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'hicks-peaceable-kingdom',
+    title: 'Peaceable Kingdom',
+    artist: 'Edward Hicks',
+    year: 'c. 1834',
+    localImage: require('../assets/gallery/hicks-peaceable-kingdom.jpg'),
+    remoteUrl: commonsUrl(
+      'Edward Hicks, Peaceable Kingdom, c. 1834, NGA 59908.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'cole-voyage-of-life-childhood',
+    title: 'The Voyage of Life - Childhood',
+    artist: 'Thomas Cole',
+    year: '1842',
+    localImage: require('../assets/gallery/cole-voyage-of-life-childhood.jpg'),
+    remoteUrl: commonsUrl(
+      'Thomas Cole, The Voyage of Life - Childhood, 1842, NGA 52450.jpg',
+      1400
+    ),
+  },
+
+  {
+    id: 'velazquez-needlewoman',
+    title: 'The Needlewoman',
+    artist: 'Diego Velázquez',
+    year: 'c. 1640-1650',
+    localImage: require('../assets/gallery/velazquez-needlewoman.jpg'),
+    remoteUrl: commonsUrl(
+      'Diego Velázquez, The Needlewoman, c. 1640-1650, NGA 88.jpg',
+      1400
+    ),
+  },
+
 ];

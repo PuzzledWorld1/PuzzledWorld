@@ -14,6 +14,7 @@ export default function ArtworkTile({
   picking,
   completed,
   favorited,
+  isNew,
   onPress,
   onToggleFavorite,
   colors,
@@ -27,7 +28,10 @@ export default function ArtworkTile({
       onPress={onPress}
     >
       <Image
-        source={artwork.localImage}
+        source={
+          artwork.localImage ??
+          { uri: artwork.remoteUrl }
+        }
         style={styles.thumbnail}
         resizeMode="contain"
       />
@@ -48,6 +52,14 @@ export default function ArtworkTile({
       )}
 
       <View style={styles.captionBar}>
+        {isNew && (
+          <View style={styles.newBadge}>
+            <Text style={styles.newBadgeText}>
+              NEW
+            </Text>
+          </View>
+        )}
+
         <Text
           style={styles.artworkTitle}
           numberOfLines={1}
@@ -120,6 +132,21 @@ function getStyles(colors) {
       color: '#e5e5e5',
       fontSize: 9,
       textAlign: 'center',
+    },
+
+    newBadge: {
+      alignSelf: 'center',
+      backgroundColor: colors.highlightBorder,
+      borderRadius: 6,
+      paddingHorizontal: 6,
+      marginBottom: 2,
+    },
+
+    newBadgeText: {
+      color: '#1c2b18',
+      fontSize: 9,
+      fontWeight: 'bold',
+      letterSpacing: 0.5,
     },
   }));
 }
