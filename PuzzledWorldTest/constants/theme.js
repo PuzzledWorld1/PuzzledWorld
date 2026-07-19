@@ -6,8 +6,8 @@ export const THEMES = {
   night: {
     statusBarStyle: 'light',
 
-    background: '#303340',
-    boardTrayBackground: '#161e33',
+    background: '#0b0f1e',
+    boardTrayBackground: '#303340',
     border: '#8b5e3c',
 
     textPrimary: '#ffffff',

@@ -7,6 +7,7 @@ import {
 } from 'react';
 
 import {
+  Image,
   Pressable,
   Share,
   StyleSheet,
@@ -45,8 +46,10 @@ import JigsawPiece, {
 import SparkleBurst from '../components/SparkleBurst';
 
 import CelebrationOverlay from '../components/CelebrationOverlay';
+import FireOverlay from '../components/FireOverlay';
 
 import ThemeToggle from '../components/ThemeToggle';
+import TimerToggle from '../components/TimerToggle';
 import { withAppFont } from '../constants/typography';
 
 import ShareIcon from '../components/ShareIcon';
@@ -69,6 +72,22 @@ import { markArtworkCompleted } from '../lib/artworkStatus';
 // container, so this is how far in from the frame's measured position
 // the actual board sits.
 const BOARD_FRAME_INSET = 10;
+
+// Must match container's paddingTop below - used to figure out how much
+// vertical space is actually left for the board (see boardMaxHeight).
+const CONTAINER_PADDING_TOP = 16;
+
+// Small safety margin so the board doesn't butt right up against the
+// header/tray sections once boardMaxHeight is computed from their
+// measured heights.
+const BOARD_AREA_BUFFER = 16;
+
+// Must match styles.trayWrapper's height below - trayWrapper itself
+// can't be measured via onLayout for boardMaxHeight (its onLayout is
+// already used to record trayLayout in screen-absolute coordinates for
+// drag-over-tray detection, which would break if it were nested inside
+// another measured wrapper), so this constant stands in for it instead.
+const TRAY_WRAPPER_HEIGHT = 92;
 
 
 // The default sparkle palette (bright pastels + white) reads fine on
@@ -162,11 +181,11 @@ function resolvePlacement({
       });
 
       // Landing on this piece's OWN slot still locks it in place, but if
-      // grid-neighbors are already locked onto THEIR correct slots too,
-      // adopt ALL of those groups (not just the first one found) instead
-      // of starting a brand new one. A single drop can bridge more than
-      // one already-solved cluster at once (e.g. filling the last gap in
-      // a corner, adjacent to two separately-built clusters) - merging
+      // grid-neighbors are already sitting correctly too, adopt ALL of
+      // those groups (not just the first one found) instead of starting
+      // a brand new one. A single drop can bridge more than one
+      // already-solved cluster at once (e.g. filling the last gap in a
+      // corner, adjacent to two separately-built clusters) - merging
       // with only one of them would leave the other permanently
       // separate, since locked pieces can't be dragged again later to
       // fix it. That's exactly the kind of bug that lets the board look
@@ -176,14 +195,45 @@ function resolvePlacement({
 
       memberIds.forEach((memberId) => {
         neighborsOf(memberId, size).forEach(
-          ({ id: neighborId }) => {
+          ({ id: neighborId, dRow, dCol }) => {
             const neighbor = others.find(
-              (o) =>
-                o.piece === neighborId &&
-                o.locked
+              (o) => o.piece === neighborId
             );
 
-            if (neighbor) {
+            if (!neighbor) {
+              return;
+            }
+
+            // A locked neighbor is guaranteed to already be sitting
+            // exactly on ITS true grid position (same space this piece
+            // just landed in), so it's adjacent by construction - no
+            // need to double check. An UNLOCKED neighbor with a
+            // matching piece ID could just as easily be mid-assembly
+            // somewhere else entirely, so it only counts if it's
+            // ACTUALLY touching where this piece landed - otherwise two
+            // clusters that were never really connected would get
+            // merged just because their piece IDs happen to be
+            // grid-adjacent.
+            if (neighbor.locked) {
+              neighborGroupIds.add(
+                neighbor.groupId
+              );
+
+              return;
+            }
+
+            const expectedX =
+              finalPositions[memberId].x +
+              dCol * pieceSize;
+
+            const expectedY =
+              finalPositions[memberId].y +
+              dRow * pieceSize;
+
+            if (
+              Math.abs(neighbor.x - expectedX) < snapDistance &&
+              Math.abs(neighbor.y - expectedY) < snapDistance
+            ) {
               neighborGroupIds.add(
                 neighbor.groupId
               );
@@ -607,6 +657,7 @@ function GroupMemberPiece({
   enabled,
   groupId,
   onDrop,
+  highlighted,
   letterboxColor,
   styles,
 }) {
@@ -679,6 +730,9 @@ function GroupMemberPiece({
                 ? 100
                 : 10,
           },
+
+          highlighted &&
+            styles.loosePieceHighlighted,
         ]}
       >
         <PieceImage
@@ -707,6 +761,7 @@ function PieceGroup({
   piecePadding,
   visualPieceSize,
   onDrop,
+  highlighted,
   letterboxColor,
   styles,
 }) {
@@ -744,6 +799,9 @@ function PieceGroup({
         enabled={!locked}
         groupId={groupId}
         onDrop={onDrop}
+        highlighted={
+          highlighted && !locked
+        }
         letterboxColor={letterboxColor}
         styles={styles}
       />
@@ -787,9 +845,48 @@ export default function PuzzleScreen({
     difficulty;
 
 
+  // Everything above/below the board (title, subtitle, tray, footer
+  // buttons) has a size that doesn't depend on the board itself, so
+  // measuring their real rendered heights here lets the board shrink to
+  // whatever's actually left over - on a short phone screen that keeps
+  // the footer buttons (Back/Share/Gallery/theme toggle) on-screen
+  // instead of being pushed off the bottom by a board sized only for
+  // width, which had no way to know the screen was too short for it.
+  const [
+    headerHeight,
+    setHeaderHeight,
+  ] =
+    useState(0);
+
+  const [
+    traySectionHeight,
+    setTraySectionHeight,
+  ] =
+    useState(0);
+
+  const [
+    footerHeight,
+    setFooterHeight,
+  ] =
+    useState(0);
+
+
+  const boardMaxHeight =
+    Math.max(
+      150,
+      windowHeight -
+        CONTAINER_PADDING_TOP -
+        headerHeight -
+        traySectionHeight -
+        footerHeight -
+        BOARD_AREA_BUFFER
+    );
+
+
   const boardSize =
     Math.min(
       windowWidth - 32,
+      boardMaxHeight,
       400
     );
 
@@ -893,6 +990,37 @@ export default function PuzzleScreen({
 
   const startTimeRef =
     useRef(Date.now());
+
+
+  const [timerEnabled, setTimerEnabled] =
+    useState(false);
+
+  const [timerMinutes, setTimerMinutes] =
+    useState(3);
+
+  const [timeLeftSeconds, setTimeLeftSeconds] =
+    useState(3 * 60);
+
+  const [timedOut, setTimedOut] =
+    useState(false);
+
+
+  // Turning Timer Mode on (or picking a different duration while it's
+  // already on) always (re)starts the clock fresh from the chosen
+  // duration - simplest mental model, rather than trying to prorate
+  // whatever time happened to already be showing.
+  useEffect(() => {
+    if (!timerEnabled) {
+      return;
+    }
+
+    setTimeLeftSeconds(timerMinutes * 60);
+    setTimedOut(false);
+  }, [
+    timerEnabled,
+    timerMinutes,
+  ]);
+
 
   const interstitialRef = useRef(
     InterstitialAd.createForAdRequest(INTERSTITIAL_AD_UNIT_ID)
@@ -1893,6 +2021,90 @@ export default function PuzzleScreen({
       1;
 
 
+  // Ticks down once a second while Timer Mode is on and the puzzle isn't
+  // solved or already timed out. Re-schedules itself each second (rather
+  // than a single setInterval) so it cleanly stops the moment any of
+  // those conditions change.
+  useEffect(() => {
+    if (
+      !timerEnabled ||
+      isSolved ||
+      timedOut
+    ) {
+      return;
+    }
+
+    if (timeLeftSeconds <= 0) {
+      setTimedOut(true);
+      return;
+    }
+
+    const id = setTimeout(() => {
+      setTimeLeftSeconds(
+        (current) => current - 1
+      );
+    }, 1000);
+
+    return () => clearTimeout(id);
+  }, [
+    timerEnabled,
+    timeLeftSeconds,
+    isSolved,
+    timedOut,
+  ]);
+
+
+  // "Try again!" after a Timer Mode burnout - re-shuffles the SAME image/
+  // difficulty into a fresh tray, exactly like the initial-mount seeding
+  // effect above, and restarts both the clock and the elapsed-time stat
+  // used for the completed-puzzle record.
+  const retryAfterTimeout =
+    useCallback(() => {
+      const pieces =
+        Array.from(
+          { length: totalPieces },
+          (_, index) => index
+        );
+
+      const shuffled =
+        [...pieces].sort(
+          () => Math.random() - 0.5
+        );
+
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      setTrayPieces(shuffled);
+      setLoosePieces([]);
+      setTrayDragPiece(null);
+      setSparkles([]);
+
+      borderCelebratedRef.current = false;
+      startTimeRef.current = Date.now();
+
+      setTimedOut(false);
+      setTimeLeftSeconds(timerMinutes * 60);
+    }, [
+      totalPieces,
+      timerMinutes,
+    ]);
+
+
+  // Once solved, swap the jigsaw grid (piece 0 sits at the assembled
+  // picture's top-left corner, and every other piece is grid-consistent
+  // with it) for one plain, seamless image at that same spot - see the
+  // render below. Pieces still carry their tab/blank cutout shapes even
+  // when perfectly placed, so leaving them up would keep showing the
+  // puzzle-piece outlines over the finished picture.
+  const solvedImageOrigin =
+    isSolved
+      ? loosePieces.find(
+          (item) => item.piece === 0
+        )
+      : null;
+
+
   // Writes the current arrangement to Firestore. loosePieces are
   // converted to grid units (relative to the board origin, in piece
   // widths) so a resume on a different screen size still lines up - see
@@ -2106,36 +2318,69 @@ export default function PuzzleScreen({
       />
 
 
-      <Text
-        style={
-          styles.title
+      <View
+        onLayout={
+          (event) =>
+            setHeaderHeight(
+              event.nativeEvent.layout.height
+            )
         }
       >
-        Get Puzzled!
-      </Text>
+        <TimerToggle
+          enabled={
+            timerEnabled
+          }
+          minutes={
+            timerMinutes
+          }
+          secondsLeft={
+            timeLeftSeconds
+          }
+          onToggle={
+            () =>
+              setTimerEnabled(
+                (current) => !current
+              )
+          }
+          onChangeMinutes={
+            setTimerMinutes
+          }
+          colors={
+            colors
+          }
+        />
 
-
-      {artworkTitle ? (
         <Text
           style={
-            styles.subtitle
+            styles.title
           }
         >
-          {artworkTitle}
-          {artworkArtist
-            ? ` — ${artworkArtist}`
-            : ''}
+          Get Puzzled!
         </Text>
-      ) : (
-        <Text
-          style={
-            styles.subtitle
-          }
-        >
-          {totalPieces}
-          {' pieces'}
-        </Text>
-      )}
+
+
+        {artworkTitle ? (
+          <Text
+            style={
+              styles.subtitle
+            }
+          >
+            {artworkTitle}
+            {artworkArtist
+              ? ` — ${artworkArtist}`
+              : ''}
+          </Text>
+        ) : (
+          <Text
+            style={
+              styles.subtitle
+            }
+          >
+            {totalPieces}
+            {' pieces'}
+          </Text>
+        )}
+      </View>
 
 
       <View
@@ -2205,13 +2450,23 @@ export default function PuzzleScreen({
       )}
 
 
-      <Text
-        style={
-          styles.trayLabel
+      <View
+        onLayout={
+          (event) =>
+            setTraySectionHeight(
+              event.nativeEvent.layout.height +
+                TRAY_WRAPPER_HEIGHT
+            )
         }
       >
-        Drag a piece onto the puzzle area.
-      </Text>
+        <Text
+          style={
+            styles.trayLabel
+          }
+        >
+          Drag a piece onto the puzzle area.
+        </Text>
+      </View>
 
 
       <View
@@ -2321,6 +2576,12 @@ export default function PuzzleScreen({
       <View
         style={
           styles.footerRow
+        }
+        onLayout={
+          (event) =>
+            setFooterHeight(
+              event.nativeEvent.layout.height
+            )
         }
       >
         <Pressable
@@ -2439,7 +2700,33 @@ export default function PuzzleScreen({
           StyleSheet.absoluteFill
         }
       >
-        {pieceGroups.map(
+        {solvedImageOrigin && (
+          <Image
+            source={{
+              uri: image,
+            }}
+            resizeMode="contain"
+            style={{
+              position: 'absolute',
+              left:
+                solvedImageOrigin.x,
+              top:
+                solvedImageOrigin.y,
+              width: boardSize,
+              height: boardSize,
+              // Matches the letterboxColor every JigsawPiece rendered
+              // during play - a non-square source image is shown
+              // "contained" rather than cropped (same as each piece
+              // did), so this needs the same fill behind it to avoid a
+              // visual jump the instant the pieces disappear.
+              backgroundColor:
+                colors.buttonSecondary,
+            }}
+          />
+        )}
+
+
+        {!isSolved && pieceGroups.map(
           ({
             groupId,
             members,
@@ -2479,6 +2766,10 @@ export default function PuzzleScreen({
 
               onDrop={
                 dropGroup
+              }
+
+              highlighted={
+                showLeftover
               }
 
               letterboxColor={
@@ -2591,6 +2882,27 @@ export default function PuzzleScreen({
           }
         />
       )}
+
+
+      {timedOut && (
+        <FireOverlay
+          width={
+            windowWidth
+          }
+
+          height={
+            windowHeight
+          }
+
+          colors={
+            colors
+          }
+
+          onRetry={
+            retryAfterTimeout
+          }
+        />
+      )}
     </View>
     </GestureDetector>
   );
@@ -2611,7 +2923,8 @@ function getStyles(colors) {
       alignItems:
         'center',
 
-      paddingTop: 28,
+      paddingTop:
+        CONTAINER_PADDING_TOP,
 
       paddingHorizontal:
         16,
@@ -2659,7 +2972,7 @@ function getStyles(colors) {
         4,
 
       marginBottom:
-        56,
+        16,
     },
 
 
@@ -2739,7 +3052,7 @@ function getStyles(colors) {
         15,
 
       marginTop:
-        65,
+        16,
 
       marginBottom:
         8,
@@ -2751,7 +3064,7 @@ function getStyles(colors) {
         '100%',
 
       height:
-        92,
+        TRAY_WRAPPER_HEIGHT,
 
       backgroundColor:
         colors.boardTrayBackground,
@@ -2805,6 +3118,21 @@ function getStyles(colors) {
     loosePiece: {
       position:
         'absolute',
+    },
+
+
+    loosePieceHighlighted: {
+      borderWidth:
+        2,
+
+      borderColor:
+        colors.highlightBorder,
+
+      borderRadius:
+        6,
+
+      backgroundColor:
+        colors.highlightBackground,
     },
 
 

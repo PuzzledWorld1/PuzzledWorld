@@ -39,22 +39,8 @@ function clamp(value, min, max) {
 }
 
 
-// Standard EXIF orientation tags -> the clockwise rotation (in degrees)
-// needed to make the raw pixel buffer match what every viewer already
-// displays for that tag. Only covers the plain-rotation tags (1/3/6/8);
-// the mirrored tags (2/4/5/7) are rare for phone camera photos and are
-// treated as "no rotation" here rather than left unhandled.
-const EXIF_ROTATION = {
-  1: 0,
-  3: 180,
-  6: 90,
-  8: 270,
-};
-
-
 export default function CropScreen({
   image,
-  imageOrientation,
   setImage,
   setScreen,
   colors,
@@ -107,73 +93,17 @@ export default function CropScreen({
   imageDisplayRef.current = imageDisplay;
 
 
-  // expo-image-manipulator's crop() works in raw pixel space and does not
-  // reliably agree with the EXIF rotation tag that RN's <Image> (and every
-  // other normal viewer) uses to display the photo right-side up. Left as
-  // -is, the box the user drags has nothing to do with the coordinates the
-  // manipulator crops from, so the result can land in a completely
-  // different part of the photo. Baking the actual EXIF-indicated rotation
-  // into the pixels once, up front, removes that ambiguity for every
-  // measurement taken after this point. processedForRef guards against
-  // this firing twice for the same image (e.g. React's dev-mode double
-  // effect invocation) kicking off two concurrent native manipulate calls.
-  const processedForRef = useRef(null);
-
+  // expo-image-manipulator already auto-corrects EXIF orientation the
+  // moment it loads an image (both the iOS and Android native modules
+  // bake it into the pixel buffer up front, via Glide's default EXIF
+  // handling on Android and ImageFixOrientationTransformer on iOS), and
+  // every measurement/crop below goes through ImageManipulator too - so
+  // no manual rotation is needed here. An earlier version of this screen
+  // re-applied the EXIF rotation itself, which double-rotated the photo
+  // on top of the manipulator's own correction.
   useEffect(() => {
-    if (!image) return;
-
-    if (processedForRef.current === image) return;
-
-    processedForRef.current = image;
-
-
-    const rotation =
-      EXIF_ROTATION[imageOrientation] ?? 0;
-
-
-    if (rotation === 0) {
-      setNormalizedImage(image);
-      return;
-    }
-
-
-    let cancelled = false;
-
-
-    ImageManipulator.manipulate(image)
-      .rotate(rotation)
-      .renderAsync()
-      .then((rendered) =>
-        rendered.saveAsync({
-          format: SaveFormat.JPEG,
-          compress: 1,
-        })
-      )
-      .then((result) => {
-        if (!cancelled) {
-          setNormalizedImage(result.uri);
-        }
-      })
-      .catch((error) => {
-        console.log(
-          'Could not normalize image orientation:',
-          error
-        );
-
-
-        if (!cancelled) {
-          setNormalizedImage(image);
-        }
-      });
-
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    image,
-    imageOrientation,
-  ]);
+    setNormalizedImage(image);
+  }, [image]);
 
 
   // Measure the photo through ImageManipulator itself rather than RN's
