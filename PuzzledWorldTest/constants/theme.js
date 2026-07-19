@@ -6,7 +6,7 @@ export const THEMES = {
   night: {
     statusBarStyle: 'light',
 
-    background: '#0b0f1e',
+    background: '#303340',
     boardTrayBackground: '#161e33',
     border: '#8b5e3c',
 
@@ -28,7 +28,7 @@ export const THEMES = {
   day: {
     statusBarStyle: 'dark',
 
-    background: '#a3b98d',
+    background: '#8b9d78',
     boardTrayBackground: '#bccca6',
     border: '#4a98c9',
 

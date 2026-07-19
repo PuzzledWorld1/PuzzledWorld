@@ -8,7 +8,6 @@ import {
 
 import {
   Pressable,
-  ScrollView,
   Share,
   StyleSheet,
   Text,
@@ -19,6 +18,7 @@ import {
 import {
   Gesture,
   GestureDetector,
+  ScrollView,
 } from 'react-native-gesture-handler';
 
 import Animated, {
@@ -134,14 +134,21 @@ function resolvePlacement({
 }) {
   const snapDistance = Math.max(pieceSize * 0.65, 18);
 
+  // A piece's OWN board slot snaps once it's dragged mostly over that
+  // slot, more forgiving than matching against a neighbor piece below -
+  // but NOT a full piece-width, which let a piece snap from so far off
+  // that it visibly jumped past an adjacent slot to reach its correct
+  // one, reading as "snapped to the wrong spot."
+  const boardSnapDistance = pieceSize * 0.8;
+
   for (const id of memberIds) {
     const target = getTarget(id);
     const pos = positions[id];
 
     if (
       target &&
-      Math.abs(pos.x - target.x) < snapDistance &&
-      Math.abs(pos.y - target.y) < snapDistance
+      Math.abs(pos.x - target.x) < boardSnapDistance &&
+      Math.abs(pos.y - target.y) < boardSnapDistance
     ) {
       const dx = target.x - pos.x;
       const dy = target.y - pos.y;
@@ -391,13 +398,23 @@ function TrayPiece({
   floatY,
   onDragStart,
   onDragEnd,
+  onSetTrayScrollEnabled,
   highlighted,
+  isDragging,
   letterboxColor,
   styles,
 }) {
   const trayVisualSize =
     trayPieceSize *
     PIECE_BOX_SCALE;
+
+
+  // Tracks whether THIS touch actually turned into a pickup (onStart
+  // fired) - lets onFinalize below tell "picked up, then released" apart
+  // from "touched a piece but it turned into a scroll or a plain tap",
+  // which never reach onDragStart/onDragEnd at all.
+  const activated =
+    useSharedValue(false);
 
 
   // activeOffsetY/failOffsetX let the tray's horizontal ScrollView keep
@@ -415,7 +432,21 @@ function TrayPiece({
     Gesture.Pan()
       .activeOffsetY([-3, 3])
       .failOffsetX([-45, 45])
+      .onTouchesDown(() => {
+        // Fires the instant a finger lands on a piece, well before any
+        // activation threshold is met - disabling the tray's scroll
+        // right here (rather than waiting for onStart) is what stops an
+        // already-scrolling/decelerating tray from "winning" the touch
+        // and making pickup feel stuck.
+        activated.value = false;
+
+        runOnJS(onSetTrayScrollEnabled)(
+          false
+        );
+      })
       .onStart((event) => {
+        activated.value = true;
+
         floatX.value =
           event.absoluteX -
           pieceSize / 2;
@@ -445,6 +476,16 @@ function TrayPiece({
           event.absoluteY -
             pieceSize / 2
         );
+      })
+      .onFinalize(() => {
+        // The touch never turned into a pickup (it failed into a scroll,
+        // or was just a tap) - onDragEnd never ran to re-enable
+        // scrolling, so this has to put it back itself.
+        if (!activated.value) {
+          runOnJS(onSetTrayScrollEnabled)(
+            true
+          );
+        }
       });
 
 
@@ -463,6 +504,15 @@ function TrayPiece({
 
           highlighted &&
             styles.trayPieceHighlighted,
+
+          // Hidden (not removed) the moment this piece leaves the tray
+          // for the finger - the FloatingPiece takes over showing it, so
+          // leaving this copy visible reads as a "ghost" left behind.
+          // Keeping the slot in the layout (rather than not rendering
+          // it) stops every other tray piece from shifting over to fill
+          // the gap while the drag is still in progress.
+          isDragging &&
+            styles.trayPieceDragging,
         ]}
       >
         <PieceImage
@@ -828,6 +878,12 @@ export default function PuzzleScreen({
   const saveTimeoutRef =
     useRef(null);
 
+  // Tracks the tray's horizontal scroll offset so a piece dropped back
+  // into the tray can be inserted at the spot the finger is actually
+  // over, rather than always at the end - see getTrayInsertIndex.
+  const trayScrollXRef =
+    useRef(0);
+
   // Guards against a slow save (e.g. one that has to upload the photo)
   // finishing AFTER a newer, faster save and clobbering it with stale
   // data - only the invocation that's still the latest by the time its
@@ -1139,6 +1195,53 @@ export default function PuzzleScreen({
     );
 
 
+  // Where in trayPieces a piece dropped at screen-x `x` should land -
+  // matches trayContent's paddingHorizontal (6) and trayPiece's
+  // marginRight (4) below, so it lines up with the piece the finger is
+  // actually over instead of always appending at the end.
+  const getTrayInsertIndex =
+    useCallback(
+      (x) => {
+        if (
+          !trayLayout
+        ) {
+          return Number.MAX_SAFE_INTEGER;
+        }
+
+        const trayVisualSize =
+          trayPieceSize *
+          PIECE_BOX_SCALE;
+
+        const itemStride =
+          trayVisualSize +
+          4;
+
+        const contentX =
+          x -
+          trayLayout.x +
+          trayScrollXRef.current -
+          6;
+
+        const index =
+          Math.round(
+            (contentX -
+              trayVisualSize / 2) /
+              itemStride
+          );
+
+        return Math.max(
+          index,
+          0
+        );
+      },
+
+      [
+        trayLayout,
+        trayPieceSize,
+      ]
+    );
+
+
   const getTarget =
     useCallback(
       (piece) => {
@@ -1419,16 +1522,37 @@ export default function PuzzleScreen({
           );
 
 
+          const insertIndex =
+            getTrayInsertIndex(
+              anchorX
+            );
+
           setTrayPieces(
-            (pieces) => [
-              ...pieces,
-              ...ids.filter(
-                (id) =>
-                  !pieces.includes(
-                    id
-                  )
-              ),
-            ]
+            (pieces) => {
+              const newIds =
+                ids.filter(
+                  (id) =>
+                    !pieces.includes(
+                      id
+                    )
+                );
+
+              const next =
+                [
+                  ...pieces,
+                ];
+
+              next.splice(
+                Math.min(
+                  insertIndex,
+                  pieces.length
+                ),
+                0,
+                ...newIds
+              );
+
+              return next;
+            }
           );
 
 
@@ -1578,6 +1702,7 @@ export default function PuzzleScreen({
       [
         loosePieces,
         isOverTray,
+        getTrayInsertIndex,
         size,
         pieceSize,
         getTarget,
@@ -1628,6 +1753,135 @@ export default function PuzzleScreen({
     }, [
       loosePieces,
     ]);
+
+
+  const borderPieceIds =
+    useMemo(() => {
+      const ids = [];
+
+      for (
+        let p = 0;
+        p < totalPieces;
+        p++
+      ) {
+        const row =
+          Math.floor(p / size);
+
+        const col =
+          p % size;
+
+        if (
+          row === 0 ||
+          row === size - 1 ||
+          col === 0 ||
+          col === size - 1
+        ) {
+          ids.push(p);
+        }
+      }
+
+      return ids;
+    }, [
+      totalPieces,
+      size,
+    ]);
+
+
+  // Skips the celebration for a resumed puzzle whose border was already
+  // finished in an earlier session - only a border completed just now,
+  // in this session, should trigger it.
+  const borderCelebratedRef =
+    useRef(
+      (() => {
+        if (!resumeState) {
+          return false;
+        }
+
+        const lockedIds =
+          new Set(
+            resumeState.loosePieces
+              .filter(
+                (item) => item.locked
+              )
+              .map(
+                (item) => item.piece
+              )
+          );
+
+        return borderPieceIds.every(
+          (id) => lockedIds.has(id)
+        );
+      })()
+    );
+
+  // A quick round of sparkles across every border piece the moment the
+  // outer frame closes up, regardless of how much (if any) of the
+  // interior is done - completing the border is its own small win.
+  useEffect(() => {
+    if (
+      borderCelebratedRef.current
+    ) {
+      return;
+    }
+
+    const lockedIds =
+      new Set(
+        loosePieces
+          .filter(
+            (item) => item.locked
+          )
+          .map(
+            (item) => item.piece
+          )
+      );
+
+    const borderComplete =
+      borderPieceIds.every(
+        (id) => lockedIds.has(id)
+      );
+
+    if (!borderComplete) {
+      return;
+    }
+
+    borderCelebratedRef.current = true;
+
+    // Spread across the border instead of firing all at once - a
+    // simultaneous burst on every border piece reads as a single instant
+    // flash rather than a little fireworks show.
+    const spawnWindowMs = 1800;
+
+    const timers = borderPieceIds.map(
+      (id, index) => {
+        const delay =
+          (index / borderPieceIds.length) *
+            spawnWindowMs +
+          Math.random() * 150;
+
+        return setTimeout(() => {
+          const target =
+            getTarget(id);
+
+          if (target) {
+            addSparkle(
+              target.x + pieceSize / 2,
+              target.y + pieceSize / 2
+            );
+          }
+        }, delay);
+      }
+    );
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [
+    loosePieces,
+    borderPieceIds,
+    getTarget,
+    addSparkle,
+    pieceSize,
+  ]);
 
 
   // Solved once every piece is out of the tray and connected into a
@@ -1983,6 +2237,16 @@ export default function PuzzleScreen({
           contentContainerStyle={
             styles.trayContent
           }
+          onScroll={
+            (event) => {
+              trayScrollXRef.current =
+                event.nativeEvent
+                  .contentOffset.x;
+            }
+          }
+          scrollEventThrottle={
+            16
+          }
         >
           {trayPieces.map(
             (piece) => (
@@ -2025,6 +2289,15 @@ export default function PuzzleScreen({
 
                 onDragEnd={
                   endTrayDrag
+                }
+
+                onSetTrayScrollEnabled={
+                  setTrayScrollEnabled
+                }
+
+                isDragging={
+                  piece ===
+                  trayDragPiece
                 }
 
                 highlighted={
@@ -2121,6 +2394,28 @@ export default function PuzzleScreen({
             </Text>
           </View>
         </Pressable>
+
+        {isSolved && (
+          <Pressable
+            style={
+              styles.backButton
+            }
+            onPress={
+              () =>
+                setScreen(
+                  'gallery'
+                )
+            }
+          >
+            <Text
+              style={
+                styles.backText
+              }
+            >
+              {'🖼️ Gallery'}
+            </Text>
+          </Pressable>
+        )}
 
         <ThemeToggle
           themeMode={
@@ -2424,7 +2719,7 @@ function getStyles(colors) {
         'bold',
 
       textShadowColor:
-        'rgba(255, 255, 255, 0.85)',
+        colors.highlightBorder,
 
       textShadowOffset: {
         width: 0,
@@ -2432,7 +2727,7 @@ function getStyles(colors) {
       },
 
       textShadowRadius:
-        8,
+        22,
     },
 
 
@@ -2499,6 +2794,11 @@ function getStyles(colors) {
 
       backgroundColor:
         colors.highlightBackground,
+    },
+
+    trayPieceDragging: {
+      opacity:
+        0,
     },
 
 

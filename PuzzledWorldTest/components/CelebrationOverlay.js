@@ -6,12 +6,12 @@ import SparkleBurst from './SparkleBurst';
 import FlowerBloom from './FlowerBloom';
 
 
-const ITEM_COUNT = 12;
+const ITEM_COUNT = 24;
 
-// Spread spawns out over ~2.6s so the celebration reads as a sequence
+// Spread spawns out over ~3.2s so the celebration reads as a sequence
 // (a garden blooming / a fireworks show) rather than everything popping
 // at once.
-const SPAWN_WINDOW_MS = 2600;
+const SPAWN_WINDOW_MS = 3200;
 
 
 // Full-screen, tap-through celebration shown once the puzzle is fully

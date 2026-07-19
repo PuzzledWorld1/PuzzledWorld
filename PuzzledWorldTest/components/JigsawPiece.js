@@ -41,15 +41,34 @@ const RAW_POINTS = [
 ];
 
 
+// A proper bit-mixing hash (squirrel-noise style), not the previous
+// `(row * a + col * b + c) % 2`. That formula collapsed to a plain
+// (row + col) parity check regardless of the constants chosen, since
+// every constant involved was odd - it produced a perfect checkerboard
+// where a piece's top/bottom/left/right all pointed the same way and
+// every piece looked identical to its diagonal neighbors. Salting with
+// a different `axis` value per call decorrelates horizontal from
+// vertical edges, so a piece can freely have one side in and the
+// opposite side out instead of a rigid alternating grid.
+function edgeHash(row, col, axis) {
+  let h = (row * 374761393) ^ (col * 668265263) ^ (axis * 2246822519);
+
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  h = (h ^ (h >>> 16)) >>> 0;
+
+  return h;
+}
+
+
 function horizontalEdge(row, col) {
-  return (row * 17 + col * 31 + 7) % 2 === 0
+  return edgeHash(row, col, 1) % 2 === 0
     ? 1
     : -1;
 }
 
 
 function verticalEdge(row, col) {
-  return (row * 29 + col * 13 + 11) % 2 === 0
+  return edgeHash(row, col, 2) % 2 === 0
     ? 1
     : -1;
 }
