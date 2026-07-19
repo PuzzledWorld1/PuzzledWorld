@@ -31,5 +31,20 @@ service firebase.storage {
       allow write: if true;
       allow read: if false;
     }
+
+    // Pre-moderation staging for the addDailyGalleryArtwork scheduled
+    // function - nothing outside the Function (Admin SDK, bypasses these
+    // rules) ever touches this, matching sharedStaging's "moderate before
+    // anything is reachable" pattern.
+    match /dailyArtworkStaging/{fileName} {
+      allow read, write: if false;
+    }
+
+    // Published daily gallery artwork - only the Function writes here
+    // (after SafeSearch passes); publicly readable like the shared/ path.
+    match /galleryArtworks/{fileName} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }

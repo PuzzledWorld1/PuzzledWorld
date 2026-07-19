@@ -10,60 +10,20 @@ import {
 
 import { StatusBar } from 'expo-status-bar';
 
-import { Asset } from 'expo-asset';
-import { File, Paths } from 'expo-file-system';
-
 import { GALLERY_ARTWORKS } from '../constants/galleryArtworks';
 import ThemeToggle from '../components/ThemeToggle';
 import ArtworkTile from '../components/ArtworkTile';
 import { withAppFont } from '../constants/typography';
+import { resolveArtworkImage } from '../lib/artworkImage';
+import {
+  getRemoteGalleryArtworks,
+  isArtworkNew,
+} from '../lib/galleryCatalog';
 import {
   listCompletedArtworkIds,
   listFavoriteArtworkIds,
   setArtworkFavorited,
 } from '../lib/artworkStatus';
-
-
-function withTimeout(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('timeout')), ms)
-    ),
-  ]);
-}
-
-
-async function resolveArtworkImage(artwork) {
-  try {
-    const destination = new File(
-      Paths.cache,
-      `${artwork.id}.jpg`
-    );
-
-    const downloaded = await withTimeout(
-      File.downloadFileAsync(
-        artwork.remoteUrl,
-        destination,
-        { idempotent: true }
-      ),
-      8000
-    );
-
-    return downloaded.uri;
-  } catch (error) {
-    console.log(
-      'Falling back to bundled artwork copy:',
-      error
-    );
-
-    const asset = await Asset.fromModule(
-      artwork.localImage
-    ).downloadAsync();
-
-    return asset.localUri ?? asset.uri;
-  }
-}
 
 
 // The "Completed" folder - every Gallery artwork this account has
@@ -95,6 +55,9 @@ export default function CompletedScreen({
   const [loaded, setLoaded] =
     useState(false);
 
+  const [allArtworks, setAllArtworks] =
+    useState(GALLERY_ARTWORKS);
+
   useEffect(() => {
     if (!user) {
       setCompletedIds([]);
@@ -113,9 +76,18 @@ export default function CompletedScreen({
     });
   }, [user]);
 
+  useEffect(() => {
+    getRemoteGalleryArtworks().then((remoteArtworks) => {
+      setAllArtworks([
+        ...GALLERY_ARTWORKS,
+        ...remoteArtworks,
+      ]);
+    });
+  }, []);
+
 
   const completedArtworks =
-    GALLERY_ARTWORKS.filter((artwork) =>
+    allArtworks.filter((artwork) =>
       completedIds.includes(artwork.id)
     );
 
@@ -222,6 +194,7 @@ export default function CompletedScreen({
             picking={pickingId === item.id}
             completed
             favorited={favoriteIds.includes(item.id)}
+            isNew={isArtworkNew(item)}
             onPress={() => pickArtwork(item)}
             onToggleFavorite={() =>
               toggleFavorite(item)

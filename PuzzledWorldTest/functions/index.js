@@ -1,18 +1,14 @@
 const { onCall, HttpsError } = require('firebase-functions/https');
 const { logger } = require('firebase-functions');
 const admin = require('firebase-admin');
-const vision = require('@google-cloud/vision');
+const { checkSafeSearch } = require('./safeSearchCheck');
+const { addDailyGalleryArtwork } = require('./dailyGalleryArtwork');
 
 admin.initializeApp();
 
-const visionClient = new vision.ImageAnnotatorClient();
-
-const REJECTED_LIKELIHOODS = new Set([
-  'LIKELY',
-  'VERY_LIKELY',
-]);
-
 const DAILY_SHARE_LIMIT = 5;
+
+exports.addDailyGalleryArtwork = addDailyGalleryArtwork;
 
 
 // CSAI Match is Google's hash-matching service for known CSAM (child
@@ -125,16 +121,8 @@ exports.moderateAndPublishSharedPuzzle = onCall(async (request) => {
     );
   }
 
-  const [visionResult] =
-    await visionClient.safeSearchDetection(gcsUri);
-
-  const safeSearch =
-    visionResult.safeSearchAnnotation || {};
-
-  const flagged =
-    REJECTED_LIKELIHOODS.has(safeSearch.adult) ||
-    REJECTED_LIKELIHOODS.has(safeSearch.racy) ||
-    REJECTED_LIKELIHOODS.has(safeSearch.violence);
+  const { flagged, safeSearch } =
+    await checkSafeSearch(gcsUri);
 
   if (flagged) {
     logger.warn('SafeSearch flagged image - blocked share', {

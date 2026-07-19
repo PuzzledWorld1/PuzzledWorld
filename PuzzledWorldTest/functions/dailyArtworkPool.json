@@ -1,0 +1,954 @@
+[
+  {
+    "id": "hals-young-man-large-hat",
+    "title": "A Young Man in a Large Hat",
+    "artist": "Frans Hals",
+    "year": "1626-1629",
+    "filename": "Frans Hals, A Young Man in a Large Hat, 1626-1629, NGA 571.jpg"
+  },
+  {
+    "id": "hals-portrait-of-a-man",
+    "title": "Portrait of a Man",
+    "artist": "Frans Hals",
+    "year": "1648-1650",
+    "filename": "Frans Hals, Portrait of a Man, 1648-1650, NGA 1167.jpg"
+  },
+  {
+    "id": "hals-civic-guard-member",
+    "title": "Portrait of a Member of the Haarlem Civic Guard",
+    "artist": "Frans Hals",
+    "year": "c. 1636-1638",
+    "filename": "Frans Hals, Portrait of a Member of the Haarlem Civic Guard, c. 1636-1638, NGA 75.jpg"
+  },
+  {
+    "id": "hals-portrait-young-man",
+    "title": "Portrait of a Young Man",
+    "artist": "Frans Hals",
+    "year": "1646-1648",
+    "filename": "Frans Hals, Portrait of a Young Man, 1646-1648, NGA 78.jpg"
+  },
+  {
+    "id": "hals-adriaen-van-ostade",
+    "title": "Adriaen van Ostade",
+    "artist": "Frans Hals",
+    "year": "1646-1648",
+    "filename": "Frans Hals, Adriaen van Ostade, 1646-1648, NGA 77.jpg"
+  },
+  {
+    "id": "inness-harvest-moon",
+    "title": "Harvest Moon",
+    "artist": "George Inness",
+    "year": "1891",
+    "filename": "George Inness, Harvest Moon, 1891, NGA 178273.jpg"
+  },
+  {
+    "id": "inness-harvest-scene-delaware",
+    "title": "Harvest Scene in the Delaware Valley",
+    "artist": "George Inness",
+    "year": "1867",
+    "filename": "George Inness, Harvest Scene in the Delaware Valley, 1867, NGA 125748.jpg"
+  },
+  {
+    "id": "inness-lake-albano-sunset",
+    "title": "Lake Albano, Sunset",
+    "artist": "George Inness",
+    "year": "c. 1874",
+    "filename": "George Inness, Lake Albano, Sunset, c. 1874, NGA 46426.jpg"
+  },
+  {
+    "id": "inness-sunset-in-the-woods",
+    "title": "Sunset in the Woods",
+    "artist": "George Inness",
+    "year": "1891",
+    "filename": "George Inness, Sunset in the Woods, 1891, NGA 166496.jpg"
+  },
+  {
+    "id": "inness-lackawanna-valley",
+    "title": "The Lackawanna Valley",
+    "artist": "George Inness",
+    "year": "c. 1856",
+    "filename": "George Inness, The Lackawanna Valley, c. 1856, NGA 30776.jpg"
+  },
+  {
+    "id": "inness-view-of-tiber",
+    "title": "View of the Tiber near Perugia",
+    "artist": "George Inness",
+    "year": "1872-1874",
+    "filename": "George Inness, View of the Tiber near Perugia, 1872-1874, NGA 53813.jpg"
+  },
+  {
+    "id": "van-dyck-filippo-cattaneo",
+    "title": "Filippo Cattaneo",
+    "artist": "Sir Anthony van Dyck",
+    "year": "1623",
+    "filename": "Sir Anthony van Dyck, Filippo Cattaneo, 1623, NGA 1232.jpg"
+  },
+  {
+    "id": "van-dyck-raffaele-raggi",
+    "title": "The Prefect Raffaele Raggi",
+    "artist": "Sir Anthony van Dyck",
+    "year": "c. 1625",
+    "filename": "Sir Anthony van Dyck, The Prefect Raffaele Raggi, c. 1625, NGA 1229.jpg"
+  },
+  {
+    "id": "van-dyck-catherine-howard",
+    "title": "Catherine Howard, Lady d'Aubigny",
+    "artist": "Sir Anthony van Dyck",
+    "year": "c. 1638",
+    "filename": "Sir Anthony van Dyck, Catherine Howard, Lady d'Aubigny, c. 1638, NGA 1234.jpg"
+  },
+  {
+    "id": "van-dyck-head-young-man",
+    "title": "Head of a Young Man",
+    "artist": "Sir Anthony van Dyck",
+    "year": "c. 1617-1618",
+    "filename": "Sir Anthony van Dyck, Head of a Young Man, c. 1617-1618, NGA 42394.jpg"
+  },
+  {
+    "id": "van-dyck-henri-de-lorraine",
+    "title": "Henri II de Lorraine",
+    "artist": "Sir Anthony van Dyck",
+    "year": "c. 1634",
+    "filename": "Sir Anthony van Dyck, Henri II de Lorraine, c. 1634, NGA 34046.jpg"
+  },
+  {
+    "id": "van-dyck-lady-with-a-fan",
+    "title": "Lady with a Fan",
+    "artist": "Sir Anthony van Dyck",
+    "year": "c. 1628",
+    "filename": "Sir Anthony van Dyck, Lady with a Fan, c. 1628, NGA 43720.jpg"
+  },
+  {
+    "id": "van-dyck-marchesa-balbi",
+    "title": "Marchesa Balbi",
+    "artist": "Sir Anthony van Dyck",
+    "year": "c. 1623",
+    "filename": "Sir Anthony van Dyck, Marchesa Balbi, c. 1623, NGA 56.jpg"
+  },
+  {
+    "id": "van-dyck-marchesa-elena-grimaldi",
+    "title": "Marchesa Elena Grimaldi Cattaneo",
+    "artist": "Sir Anthony van Dyck",
+    "year": "1623",
+    "filename": "Sir Anthony van Dyck, Marchesa Elena Grimaldi Cattaneo, 1623, NGA 1231.jpg"
+  },
+  {
+    "id": "van-dyck-philip-lord-wharton",
+    "title": "Philip, Lord Wharton",
+    "artist": "Sir Anthony van Dyck",
+    "year": "1632",
+    "filename": "Sir Anthony van Dyck, Philip, Lord Wharton, 1632, NGA 57.jpg"
+  },
+  {
+    "id": "van-dyck-flemish-lady",
+    "title": "Portrait of a Flemish Lady",
+    "artist": "Sir Anthony van Dyck",
+    "year": "probably 1618",
+    "filename": "Sir Anthony van Dyck, Portrait of a Flemish Lady, probably 1618, NGA 573.jpg"
+  },
+  {
+    "id": "van-dyck-susanna-fourment",
+    "title": "Susanna Fourment and Her Daughter",
+    "artist": "Sir Anthony van Dyck",
+    "year": "1621",
+    "filename": "Sir Anthony van Dyck, Susanna Fourment and Her Daughter, 1621, NGA 55.jpg"
+  },
+  {
+    "id": "stuart-abigail-adams",
+    "title": "Abigail Smith Adams (Mrs. John Adams)",
+    "artist": "Gilbert Stuart",
+    "year": "1800-1815",
+    "filename": "Gilbert Stuart, Abigail Smith Adams (Mrs. John Adams), 1800-1815, NGA 42934.jpg"
+  },
+  {
+    "id": "stuart-ann-barry",
+    "title": "Ann Barry",
+    "artist": "Gilbert Stuart",
+    "year": "1803-1805",
+    "filename": "Gilbert Stuart, Ann Barry, 1803-1805, NGA 42939.jpg"
+  },
+  {
+    "id": "stuart-anna-maria-thornton",
+    "title": "Anna Maria Brodeau Thornton (Mrs. William Thornton)",
+    "artist": "Gilbert Stuart",
+    "year": "1804",
+    "filename": "Gilbert Stuart, Anna Maria Brodeau Thornton (Mrs. William Thornton), 1804, NGA 1120.jpg"
+  },
+  {
+    "id": "stuart-benjamin-tappan",
+    "title": "Benjamin Tappan",
+    "artist": "Gilbert Stuart",
+    "year": "1814",
+    "filename": "Gilbert Stuart, Benjamin Tappan, 1814, NGA 52387.jpg"
+  },
+  {
+    "id": "stuart-joseph-anthony",
+    "title": "Captain Joseph Anthony",
+    "artist": "Gilbert Stuart",
+    "year": "1794",
+    "filename": "Gilbert Stuart, Captain Joseph Anthony, 1794, NGA 1105.jpg"
+  },
+  {
+    "id": "stuart-catherine-yates",
+    "title": "Catherine Brass Yates (Mrs. Richard Yates)",
+    "artist": "Gilbert Stuart",
+    "year": "1793-1794",
+    "filename": "Gilbert Stuart, Catherine Brass Yates (Mrs. Richard Yates), 1793-1794, NGA 563.jpg"
+  },
+  {
+    "id": "stuart-thomas-macdonough",
+    "title": "Commodore Thomas Macdonough",
+    "artist": "Gilbert Stuart",
+    "year": "c. 1815-1818",
+    "filename": "Gilbert Stuart, Commodore Thomas Macdonough, c. 1815-1818, NGA 1111.jpg"
+  },
+  {
+    "id": "stuart-eleanor-parke-custis",
+    "title": "Eleanor Parke Custis Lewis (Mrs. Lawrence Lewis)",
+    "artist": "Gilbert Stuart",
+    "year": "1804",
+    "filename": "Gilbert Stuart, Eleanor Parke Custis Lewis (Mrs. Lawrence Lewis), 1804, NGA 54975.jpg"
+  },
+  {
+    "id": "stuart-george-washington-vaughan",
+    "title": "George Washington (Vaughan portrait)",
+    "artist": "Gilbert Stuart",
+    "year": "1795",
+    "filename": "Gilbert Stuart, George Washington (Vaughan portrait), 1795, NGA 1121.jpg"
+  },
+  {
+    "id": "stuart-james-madison",
+    "title": "James Madison",
+    "artist": "Gilbert Stuart",
+    "year": "c. 1821",
+    "filename": "Gilbert Stuart, James Madison, c. 1821, NGA 56914.jpg"
+  },
+  {
+    "id": "stuart-james-monroe",
+    "title": "James Monroe",
+    "artist": "Gilbert Stuart",
+    "year": "c. 1817",
+    "filename": "Gilbert Stuart, James Monroe, c. 1817, NGA 56915.jpg"
+  },
+  {
+    "id": "stuart-john-adams",
+    "title": "John Adams",
+    "artist": "Gilbert Stuart",
+    "year": "c. 1800-1815",
+    "filename": "Gilbert Stuart, John Adams, c. 1800-1815, NGA 42933.jpg"
+  },
+  {
+    "id": "stuart-john-jay",
+    "title": "John Jay",
+    "artist": "Gilbert Stuart",
+    "year": "1794",
+    "filename": "Gilbert Stuart, John Jay, 1794, NGA 75023.jpg"
+  },
+  {
+    "id": "stuart-joseph-coolidge",
+    "title": "Joseph Coolidge",
+    "artist": "Gilbert Stuart",
+    "year": "1820",
+    "filename": "Gilbert Stuart, Joseph Coolidge, 1820, NGA 562.jpg"
+  },
+  {
+    "id": "stuart-thomas-jefferson",
+    "title": "Thomas Jefferson",
+    "artist": "Gilbert Stuart",
+    "year": "c. 1821",
+    "filename": "Gilbert Stuart, Thomas Jefferson, c. 1821, NGA 69391.jpg"
+  },
+  {
+    "id": "morisot-edge-of-the-forest",
+    "title": "At the Edge of the Forest (Edma and Jeanne)",
+    "artist": "Berthe Morisot",
+    "year": "c. 1872",
+    "filename": "Berthe Morisot, At the Edge of the Forest (Edma and Jeanne), c. 1872, NGA 164943.jpg"
+  },
+  {
+    "id": "morisot-girl-in-a-boat-geese",
+    "title": "Girl in a Boat with Geese",
+    "artist": "Berthe Morisot",
+    "year": "c. 1889",
+    "filename": "Berthe Morisot, Girl in a Boat with Geese, c. 1889, NGA 52194.jpg"
+  },
+  {
+    "id": "morisot-girl-seated",
+    "title": "Girl Seated",
+    "artist": "Berthe Morisot",
+    "year": "1894",
+    "filename": "Berthe Morisot, Girl Seated, 1894, NGA 52305.jpg"
+  },
+  {
+    "id": "morisot-hanging-laundry",
+    "title": "Hanging the Laundry out to Dry",
+    "artist": "Berthe Morisot",
+    "year": "1875",
+    "filename": "Berthe Morisot, Hanging the Laundry out to Dry, 1875, NGA 66426.jpg"
+  },
+  {
+    "id": "morisot-in-the-dining-room",
+    "title": "In the Dining Room",
+    "artist": "Berthe Morisot",
+    "year": "1886",
+    "filename": "Berthe Morisot, In the Dining Room, 1886, NGA 46660.jpg"
+  },
+  {
+    "id": "morisot-landscape",
+    "title": "Landscape",
+    "artist": "Berthe Morisot",
+    "year": "n.d.",
+    "filename": "Berthe Morisot, Landscape, NGA 52306.jpg"
+  },
+  {
+    "id": "morisot-peonies",
+    "title": "Peonies",
+    "artist": "Berthe Morisot",
+    "year": "c. 1869",
+    "filename": "Berthe Morisot, Peonies, c. 1869, NGA 89682.jpg"
+  },
+  {
+    "id": "morisot-spring-landscape",
+    "title": "Spring Landscape",
+    "artist": "Berthe Morisot",
+    "year": "c. 1890-1891",
+    "filename": "Berthe Morisot, Spring Landscape, c. 1890-1891, NGA 52307.jpg"
+  },
+  {
+    "id": "morisot-sister-edma-seated",
+    "title": "The Artist's Sister Edma Seated in a Park",
+    "artist": "Berthe Morisot",
+    "year": "1864",
+    "filename": "Berthe Morisot, The Artist's Sister Edma Seated in a Park, 1864, NGA 52303.jpg"
+  },
+  {
+    "id": "morisot-sister-edma-daughter",
+    "title": "The Artist's Sister, Edma, with Her Daughter, Jeanne",
+    "artist": "Berthe Morisot",
+    "year": "1872",
+    "filename": "Berthe Morisot, The Artist's Sister, Edma, with Her Daughter, Jeanne, 1872, NGA 52304.jpg"
+  },
+  {
+    "id": "morisot-girl-with-an-apron",
+    "title": "Young Girl with an Apron",
+    "artist": "Berthe Morisot",
+    "year": "1891",
+    "filename": "Berthe Morisot, Young Girl with an Apron, 1891, NGA 131028.jpg"
+  },
+  {
+    "id": "morisot-straw-hat",
+    "title": "Young Woman with a Straw Hat",
+    "artist": "Berthe Morisot",
+    "year": "1884",
+    "filename": "Berthe Morisot, Young Woman with a Straw Hat, 1884, NGA 52193.jpg"
+  },
+  {
+    "id": "morisot-harbor-at-lorient",
+    "title": "The Harbor at Lorient",
+    "artist": "Berthe Morisot",
+    "year": "1869",
+    "filename": "Berthe Morisot, The Harbor at Lorient, 1869, NGA 52192.jpg"
+  },
+  {
+    "id": "degas-achille-de-gas",
+    "title": "Achille De Gas in the Uniform of a Cadet",
+    "artist": "Edgar Degas",
+    "year": "1856-1857",
+    "filename": "Edgar Degas, Achille De Gas in the Uniform of a Cadet, 1856-1857, NGA 46598.jpg"
+  },
+  {
+    "id": "degas-before-the-ballet",
+    "title": "Before the Ballet",
+    "artist": "Edgar Degas",
+    "year": "1890-1892",
+    "filename": "Edgar Degas, Before the Ballet, 1890-1892, NGA 1158.jpg"
+  },
+  {
+    "id": "degas-dancers-backstage",
+    "title": "Dancers Backstage",
+    "artist": "Edgar Degas",
+    "year": "1876-1883",
+    "filename": "Edgar Degas, Dancers Backstage, 1876-1883, NGA 52169.jpg"
+  },
+  {
+    "id": "degas-four-dancers",
+    "title": "Four Dancers",
+    "artist": "Edgar Degas",
+    "year": "c. 1899",
+    "filename": "Edgar Degas, Four Dancers, c. 1899, NGA 46597.jpg"
+  },
+  {
+    "id": "degas-girl-in-red",
+    "title": "Girl in Red",
+    "artist": "Edgar Degas",
+    "year": "c. 1866",
+    "filename": "Edgar Degas, Girl in Red, c. 1866, NGA 46492.jpg"
+  },
+  {
+    "id": "degas-horses-in-a-meadow",
+    "title": "Horses in a Meadow",
+    "artist": "Edgar Degas",
+    "year": "1871",
+    "filename": "Edgar Degas, Horses in a Meadow, 1871, NGA 91222.jpg"
+  },
+  {
+    "id": "degas-madame-camus",
+    "title": "Madame Camus",
+    "artist": "Edgar Degas",
+    "year": "1869-1870",
+    "filename": "Edgar Degas, Madame Camus, 1869-1870, NGA 46596.jpg"
+  },
+  {
+    "id": "degas-madame-rene-de-gas",
+    "title": "Madame René de Gas",
+    "artist": "Edgar Degas",
+    "year": "1872-1873",
+    "filename": "Edgar Degas, Madame René de Gas, 1872-1873, NGA 46599.jpg"
+  },
+  {
+    "id": "degas-mademoiselle-malo",
+    "title": "Mademoiselle Malo",
+    "artist": "Edgar Degas",
+    "year": "c. 1877",
+    "filename": "Edgar Degas, Mademoiselle Malo, c. 1877, NGA 46493.jpg"
+  },
+  {
+    "id": "degas-rene-de-gas",
+    "title": "René de Gas",
+    "artist": "Edgar Degas",
+    "year": "1855",
+    "filename": "Edgar Degas, René de Gas, 1855, NGA 92995.jpg"
+  },
+  {
+    "id": "degas-self-portrait-white-collar",
+    "title": "Self-Portrait with White Collar",
+    "artist": "Edgar Degas",
+    "year": "c. 1857",
+    "filename": "Edgar Degas, Self-Portrait with White Collar, c. 1857, NGA 92994.jpg"
+  },
+  {
+    "id": "degas-the-dance-lesson",
+    "title": "The Dance Lesson",
+    "artist": "Edgar Degas",
+    "year": "c. 1879",
+    "filename": "Edgar Degas, The Dance Lesson, c. 1879, NGA 93045.jpg"
+  },
+  {
+    "id": "degas-the-races",
+    "title": "The Races",
+    "artist": "Edgar Degas",
+    "year": "1871-1872",
+    "filename": "Edgar Degas, The Races, 1871-1872, NGA 1157.jpg"
+  },
+  {
+    "id": "degas-the-riders",
+    "title": "The Riders",
+    "artist": "Edgar Degas",
+    "year": "c. 1885",
+    "filename": "Edgar Degas, The Riders, c. 1885, NGA 164915.jpg"
+  },
+  {
+    "id": "degas-woman-ironing",
+    "title": "Woman Ironing",
+    "artist": "Edgar Degas",
+    "year": "begun c. 1876",
+    "filename": "Edgar Degas, Woman Ironing, begun c. 1876, completed c. 1887, NGA 53532.jpg"
+  },
+  {
+    "id": "degas-woman-from-behind",
+    "title": "Woman Viewed from Behind (Visit to a Museum)",
+    "artist": "Edgar Degas",
+    "year": "c. 1879-1885",
+    "filename": "Edgar Degas, Woman Viewed from Behind (Visit to a Museum), c. 1879-1885, NGA 66409.jpg"
+  },
+  {
+    "id": "degas-young-woman-in-black",
+    "title": "Young Woman in Black",
+    "artist": "Edgar Degas",
+    "year": "1861-1865",
+    "filename": "Edgar Degas, Young Woman in Black, 1861-1865, NGA 92993.jpg"
+  },
+  {
+    "id": "monet-woman-under-willows",
+    "title": "Woman Seated under the Willows",
+    "artist": "Claude Monet",
+    "year": "1880",
+    "filename": "Claude Monet, Woman Seated under the Willows, 1880, NGA 46653.jpg"
+  },
+  {
+    "id": "monet-cliffs-at-pourville",
+    "title": "Cliffs at Pourville",
+    "artist": "Claude Monet",
+    "year": "1882",
+    "filename": "Claude Monet, Cliffs at Pourville, 1882, NGA 66425.jpg"
+  },
+  {
+    "id": "monet-japanese-footbridge",
+    "title": "The Japanese Footbridge",
+    "artist": "Claude Monet",
+    "year": "1899",
+    "filename": "Claude Monet, The Japanese Footbridge, 1899, NGA 74796.jpg"
+  },
+  {
+    "id": "monet-waterloo-bridge-dusk",
+    "title": "Waterloo Bridge, London, at Dusk",
+    "artist": "Claude Monet",
+    "year": "1904",
+    "filename": "Claude Monet, Waterloo Bridge, London, at Dusk, 1904, NGA 61377.jpg"
+  },
+  {
+    "id": "monet-waterloo-bridge-gray-day",
+    "title": "Waterloo Bridge, Gray Day",
+    "artist": "Claude Monet",
+    "year": "1903",
+    "filename": "Claude Monet, Waterloo Bridge, Gray Day, 1903, NGA 46658.jpg"
+  },
+  {
+    "id": "monet-waterloo-bridge-sunset",
+    "title": "Waterloo Bridge, London, at Sunset",
+    "artist": "Claude Monet",
+    "year": "1904",
+    "filename": "Claude Monet, Waterloo Bridge, London, at Sunset, 1904, NGA 61378.jpg"
+  },
+  {
+    "id": "monet-garden-at-vetheuil",
+    "title": "The Artist's Garden at Vétheuil",
+    "artist": "Claude Monet",
+    "year": "1881",
+    "filename": "Claude Monet, The Artist's Garden at Vétheuil, 1881, NGA 52189.jpg"
+  },
+  {
+    "id": "monet-sainte-adresse",
+    "title": "Sainte-Adresse",
+    "artist": "Claude Monet",
+    "year": "1867",
+    "filename": "Claude Monet, Sainte-Adresse, 1867, NGA 71550.jpg"
+  },
+  {
+    "id": "monet-banks-of-seine-vetheuil",
+    "title": "Banks of the Seine, Vétheuil",
+    "artist": "Claude Monet",
+    "year": "1880",
+    "filename": "Claude Monet, Banks of the Seine, Vétheuil, 1880, NGA 46652.jpg"
+  },
+  {
+    "id": "monet-morning-haze",
+    "title": "Morning Haze",
+    "artist": "Claude Monet",
+    "year": "1888",
+    "filename": "Claude Monet, Morning Haze, 1888, NGA 45872.jpg"
+  },
+  {
+    "id": "monet-palazzo-da-mula",
+    "title": "Palazzo da Mula, Venice",
+    "artist": "Claude Monet",
+    "year": "1908",
+    "filename": "Claude Monet, Palazzo da Mula, Venice, 1908, NGA 46657.jpg"
+  },
+  {
+    "id": "monet-ships-riding-seine-rouen",
+    "title": "Ships Riding on the Seine at Rouen",
+    "artist": "Claude Monet",
+    "year": "1872-1873",
+    "filename": "Claude Monet, Ships Riding on the Seine at Rouen, 1872-1873, NGA 52187.jpg"
+  },
+  {
+    "id": "monet-the-willows",
+    "title": "The Willows",
+    "artist": "Claude Monet",
+    "year": "1880",
+    "filename": "Claude Monet, The Willows, 1880, NGA 178254.jpg"
+  },
+  {
+    "id": "monet-bridge-argenteuil-gray-day",
+    "title": "Bridge at Argenteuil on a Gray Day",
+    "artist": "Claude Monet",
+    "year": "c. 1876",
+    "filename": "Claude Monet, Bridge at Argenteuil on a Gray Day, c. 1876, NGA 52188.jpg"
+  },
+  {
+    "id": "pissarro-landscape-les-patis",
+    "title": "Landscape at Les Pâtis, Pontoise",
+    "artist": "Camille Pissarro",
+    "year": "1868",
+    "filename": "Camille Pissarro, Landscape at Les Pâtis, Pontoise, 1868, NGA 72886.jpg"
+  },
+  {
+    "id": "pissarro-landscape-ile-de-france",
+    "title": "Landscape, Ile-de-France",
+    "artist": "Camille Pissarro",
+    "year": "1873",
+    "filename": "Camille Pissarro, Landscape, Ile-de-France, 1873, NGA 164950.jpg"
+  },
+  {
+    "id": "pissarro-louvre-afternoon-rain",
+    "title": "The Louvre, Afternoon, Rainy Weather",
+    "artist": "Camille Pissarro",
+    "year": "1900",
+    "filename": "Camille Pissarro, The Louvre, Afternoon, Rainy Weather, 1900, NGA 195850.jpg"
+  },
+  {
+    "id": "pissarro-the-fence",
+    "title": "The Fence",
+    "artist": "Camille Pissarro",
+    "year": "1872",
+    "filename": "Camille Pissarro, The Fence, 1872, NGA 66429.jpg"
+  },
+  {
+    "id": "pissarro-orchard-in-bloom",
+    "title": "Orchard in Bloom, Louveciennes",
+    "artist": "Camille Pissarro",
+    "year": "1872",
+    "filename": "Camille Pissarro, Orchard in Bloom, Louveciennes, 1872, NGA 52195.jpg"
+  },
+  {
+    "id": "pissarro-boulevard-italiens-morning",
+    "title": "Boulevard des Italiens, Morning, Sunlight",
+    "artist": "Camille Pissarro",
+    "year": "1897",
+    "filename": "Camille Pissarro, Boulevard des Italiens, Morning, Sunlight, 1897, NGA 46673.jpg"
+  },
+  {
+    "id": "pissarro-bridge-at-caracas",
+    "title": "Bridge at Caracas",
+    "artist": "Camille Pissarro",
+    "year": "1854",
+    "filename": "Camille Pissarro, Bridge at Caracas, 1854, NGA 66509.jpg"
+  },
+  {
+    "id": "pissarro-charing-cross-bridge",
+    "title": "Charing Cross Bridge, London",
+    "artist": "Camille Pissarro",
+    "year": "1890",
+    "filename": "Camille Pissarro, Charing Cross Bridge, London, 1890, NGA 66430.jpg"
+  },
+  {
+    "id": "pissarro-creek-st-thomas",
+    "title": "A Creek in St. Thomas (Virgin Islands)",
+    "artist": "Camille Pissarro",
+    "year": "1856",
+    "filename": "Camille Pissarro, A Creek in St. Thomas (Virgin Islands), 1856, NGA 66427.jpg"
+  },
+  {
+    "id": "pissarro-hampton-court-green",
+    "title": "Hampton Court Green",
+    "artist": "Camille Pissarro",
+    "year": "1891",
+    "filename": "Camille Pissarro, Hampton Court Green, 1891, NGA 52197.jpg"
+  },
+  {
+    "id": "pissarro-young-peasant-girls",
+    "title": "Young Peasant Girls Resting in the Fields near Pontoise",
+    "artist": "Camille Pissarro",
+    "year": "1882",
+    "filename": "Camille Pissarro, Young Peasant Girls Resting in the Fields near Pontoise, 1882, NGA 164952.jpg"
+  },
+  {
+    "id": "pissarro-peasant-woman",
+    "title": "Peasant Woman",
+    "artist": "Camille Pissarro",
+    "year": "1880",
+    "filename": "Camille Pissarro, Peasant Woman, 1880, NGA 46674.jpg"
+  },
+  {
+    "id": "pissarro-peasant-girl-straw-hat",
+    "title": "Peasant Girl with a Straw Hat",
+    "artist": "Camille Pissarro",
+    "year": "1881",
+    "filename": "Camille Pissarro, Peasant Girl with a Straw Hat, 1881, NGA 155712.jpg"
+  },
+  {
+    "id": "pissarro-two-women-chatting",
+    "title": "Two Women Chatting by the Sea, St. Thomas",
+    "artist": "Camille Pissarro",
+    "year": "1856",
+    "filename": "Camille Pissarro, Two Women Chatting by the Sea, St. Thomas, 1856, NGA 66428.jpg"
+  },
+  {
+    "id": "cezanne-water-edge",
+    "title": "At the Water's Edge",
+    "artist": "Paul Cézanne",
+    "year": "c. 1890",
+    "filename": "Paul Cézanne, At the Water's Edge, c. 1890, NGA 53119.jpg"
+  },
+  {
+    "id": "cezanne-banks-of-seine-medan",
+    "title": "Banks of the Seine at Médan",
+    "artist": "Paul Cézanne",
+    "year": "c. 1885-1890",
+    "filename": "Paul Cézanne, Banks of the Seine at Médan, c. 1885-1890, NGA 52165.jpg"
+  },
+  {
+    "id": "cezanne-house-of-pere-lacroix",
+    "title": "House of Père Lacroix",
+    "artist": "Paul Cézanne",
+    "year": "1873",
+    "filename": "Paul Cézanne, House of Père Lacroix, 1873, NGA 46577.jpg"
+  },
+  {
+    "id": "cezanne-houses-in-provence",
+    "title": "Houses in Provence - The Riaux Valley near L'Estaque",
+    "artist": "Paul Cézanne",
+    "year": "c. 1883",
+    "filename": "Paul Cézanne, Houses in Provence - The Riaux Valley near L'Estaque, c. 1883, NGA 54129.jpg"
+  },
+  {
+    "id": "cezanne-landscape-near-paris",
+    "title": "Landscape near Paris",
+    "artist": "Paul Cézanne",
+    "year": "c. 1876",
+    "filename": "Paul Cézanne, Landscape near Paris, c. 1876, NGA 46578.jpg"
+  },
+  {
+    "id": "cezanne-louis-guillaume",
+    "title": "Louis Guillaume",
+    "artist": "Paul Cézanne",
+    "year": "1879-1890",
+    "filename": "Paul Cézanne, Louis Guillaume, 1879-1890, NGA 46576.jpg"
+  },
+  {
+    "id": "cezanne-man-with-pipe",
+    "title": "Man with Pipe",
+    "artist": "Paul Cézanne",
+    "year": "1892-1896",
+    "filename": "Paul Cézanne, Man with Pipe, 1892-1896, NGA 53121.jpg"
+  },
+  {
+    "id": "cezanne-artists-father-reading",
+    "title": "The Artist's Father, Reading \"L'Événement\"",
+    "artist": "Paul Cézanne",
+    "year": "1866",
+    "filename": "Paul Cézanne, The Artist's Father, Reading \"L'Événement\", 1866, NGA 52085.jpg"
+  },
+  {
+    "id": "cezanne-artists-son-paul",
+    "title": "The Artist's Son, Paul",
+    "artist": "Paul Cézanne",
+    "year": "1886-1887",
+    "filename": "Paul Cézanne, The Artist's Son, Paul, 1886-1887, NGA 46575.jpg"
+  },
+  {
+    "id": "cezanne-bend-in-the-road",
+    "title": "The Bend in the Road",
+    "artist": "Paul Cézanne",
+    "year": "1900-1906",
+    "filename": "Paul Cézanne, The Bend in the Road, 1900-1906, NGA 66406.jpg"
+  },
+  {
+    "id": "cezanne-gardener-vallier",
+    "title": "The Gardener Vallier",
+    "artist": "Paul Cézanne",
+    "year": "1906",
+    "filename": "Paul Cézanne, The Gardener Vallier, 1906, NGA 45877.jpg"
+  },
+  {
+    "id": "cezanne-vase-of-flowers",
+    "title": "Vase of Flowers",
+    "artist": "Paul Cézanne",
+    "year": "1900-1903",
+    "filename": "Paul Cézanne, Vase of Flowers, 1900-1903, NGA 45867.jpg"
+  },
+  {
+    "id": "manet-george-moore-garden",
+    "title": "George Moore in the Artist's Garden",
+    "artist": "Édouard Manet",
+    "year": "c. 1879",
+    "filename": "Edouard Manet, George Moore in the Artist's Garden, c. 1879, NGA 136019.jpg"
+  },
+  {
+    "id": "manet-still-life-melon-peaches",
+    "title": "Still Life with Melon and Peaches",
+    "artist": "Édouard Manet",
+    "year": "c. 1866",
+    "filename": "Edouard Manet, Still Life with Melon and Peaches, c. 1866, NGA 46004.jpg"
+  },
+  {
+    "id": "manet-tama-japanese-dog",
+    "title": "Tama, the Japanese Dog",
+    "artist": "Édouard Manet",
+    "year": "c. 1875",
+    "filename": "Edouard Manet, Tama, the Japanese Dog, c. 1875, NGA 92997.jpg"
+  },
+  {
+    "id": "manet-the-melon",
+    "title": "The Melon",
+    "artist": "Édouard Manet",
+    "year": "c. 1880",
+    "filename": "Edouard Manet, The Melon, c. 1880, NGA 164939.jpg"
+  },
+  {
+    "id": "manet-the-railway",
+    "title": "The Railway",
+    "artist": "Édouard Manet",
+    "year": "1873",
+    "filename": "Edouard Manet, The Railway, 1873, NGA 43624.jpg"
+  },
+  {
+    "id": "sargent-beatrice-townsend",
+    "title": "Miss Beatrice Townsend",
+    "artist": "John Singer Sargent",
+    "year": "1882",
+    "filename": "John Singer Sargent, Miss Beatrice Townsend, 1882, NGA 96999.jpg"
+  },
+  {
+    "id": "sargent-grace-woodhouse",
+    "title": "Miss Grace Woodhouse",
+    "artist": "John Singer Sargent",
+    "year": "1890",
+    "filename": "John Singer Sargent, Miss Grace Woodhouse, 1890, NGA 46431.jpg"
+  },
+  {
+    "id": "sargent-mathilde-townsend",
+    "title": "Miss Mathilde Townsend",
+    "artist": "John Singer Sargent",
+    "year": "1907",
+    "filename": "John Singer Sargent, Miss Mathilde Townsend, 1907, NGA 41608.jpg"
+  },
+  {
+    "id": "sargent-pavement-cairo",
+    "title": "Pavement, Cairo",
+    "artist": "John Singer Sargent",
+    "year": "1891",
+    "filename": "John Singer Sargent, Pavement, Cairo, 1891, NGA 129288.jpg"
+  },
+  {
+    "id": "sargent-peter-widener",
+    "title": "Peter A. B. Widener",
+    "artist": "John Singer Sargent",
+    "year": "1902",
+    "filename": "John Singer Sargent, Peter A. B. Widener, 1902, NGA 1240.jpg"
+  },
+  {
+    "id": "sargent-simplon-pass",
+    "title": "Simplon Pass",
+    "artist": "John Singer Sargent",
+    "year": "1911",
+    "filename": "John Singer Sargent, Simplon Pass, 1911, NGA 166471.jpg"
+  },
+  {
+    "id": "sargent-valdemosa-majorca",
+    "title": "Valdemosa, Majorca - Thistles and Herbage on a Hillside",
+    "artist": "John Singer Sargent",
+    "year": "1908",
+    "filename": "John Singer Sargent, Valdemosa, Majorca - Thistles and Herbage on a Hillside, 1908, NGA 73835.jpg"
+  },
+  {
+    "id": "whistler-alexander-hannay",
+    "title": "Alexander Arnold Hannay",
+    "artist": "James McNeill Whistler",
+    "year": "c. 1896",
+    "filename": "James McNeill Whistler, Alexander Arnold Hannay, c. 1896, NGA 30217.jpg"
+  },
+  {
+    "id": "whistler-alice-butt",
+    "title": "Alice Butt",
+    "artist": "James McNeill Whistler",
+    "year": "c. 1895",
+    "filename": "James McNeill Whistler, Alice Butt, c. 1895, NGA 35081.jpg"
+  },
+  {
+    "id": "whistler-battersea-reach",
+    "title": "Battersea Reach",
+    "artist": "James McNeill Whistler",
+    "year": "c. 1863",
+    "filename": "James McNeill Whistler, Battersea Reach, c. 1863, NGA 82416.jpg"
+  },
+  {
+    "id": "whistler-george-vanderbilt",
+    "title": "George W. Vanderbilt",
+    "artist": "James McNeill Whistler",
+    "year": "1897-1903",
+    "filename": "James McNeill Whistler, George W. Vanderbilt, 1897-1903, NGA 45880.jpg"
+  },
+  {
+    "id": "whistler-chelsea-wharf",
+    "title": "Grey and Silver - Chelsea Wharf",
+    "artist": "James McNeill Whistler",
+    "year": "c. 1864-1868",
+    "filename": "James McNeill Whistler, Grey and Silver - Chelsea Wharf, c. 1864-1868, NGA 1238.jpg"
+  },
+  {
+    "id": "daumier-advice-young-artist",
+    "title": "Advice to a Young Artist",
+    "artist": "Honoré Daumier",
+    "year": "c. 1865-1868",
+    "filename": "Advice to a Young Artist by Honoré Daumier c1865-68.jpg"
+  },
+  {
+    "id": "daumier-french-theater",
+    "title": "French Theater",
+    "artist": "Honoré Daumier",
+    "year": "c. 1856",
+    "filename": "Daumier - French Theater, c. 1856.jpg"
+  },
+  {
+    "id": "daumier-wandering-saltimbanques",
+    "title": "Wandering Saltimbanques",
+    "artist": "Honoré Daumier",
+    "year": "1847-1850",
+    "filename": "Daumier - Wandering Saltimbanques, 1847-1850.jpg"
+  },
+  {
+    "id": "daumier-in-church",
+    "title": "In Church",
+    "artist": "Honoré Daumier",
+    "year": "n.d.",
+    "filename": "In Church A19091.jpg"
+  },
+  {
+    "id": "canaletto-english-capriccio-column",
+    "title": "English Landscape Capriccio with a Column",
+    "artist": "Canaletto",
+    "year": "c. 1754",
+    "filename": "Canaletto, English Landscape Capriccio with a Column, c. 1754, NGA 47179.jpg"
+  },
+  {
+    "id": "canaletto-english-capriccio-palace",
+    "title": "English Landscape Capriccio with a Palace",
+    "artist": "Canaletto",
+    "year": "c. 1754",
+    "filename": "Canaletto, English Landscape Capriccio with a Palace, c. 1754, NGA 47180.jpg"
+  },
+  {
+    "id": "canaletto-grand-canal-molo",
+    "title": "Entrance to the Grand Canal from the Molo, Venice",
+    "artist": "Canaletto",
+    "year": "1742-1744",
+    "filename": "Canaletto, Entrance to the Grand Canal from the Molo, Venice, 1742-1744, NGA 32589.jpg"
+  },
+  {
+    "id": "canaletto-porta-portello-padua",
+    "title": "The Porta Portello, Padua",
+    "artist": "Canaletto",
+    "year": "c. 1741-1742",
+    "filename": "Canaletto, The Porta Portello, Padua, c. 1741-1742, NGA 46152.jpg"
+  },
+  {
+    "id": "canaletto-square-saint-marks",
+    "title": "The Square of Saint Mark's, Venice",
+    "artist": "Canaletto",
+    "year": "1742-1744",
+    "filename": "Canaletto, The Square of Saint Mark's, Venice, 1742-1744, NGA 32588.jpg"
+  },
+  {
+    "id": "bellotto-nymphenburg-palace",
+    "title": "Nymphenburg Palace, Munich",
+    "artist": "Bernardo Bellotto",
+    "year": "c. 1761",
+    "filename": "Bernardo Bellotto and Workshop, Nymphenburg Palace, Munich, c. 1761, NGA 46162.jpg"
+  },
+  {
+    "id": "bellotto-view-of-munich",
+    "title": "View of Munich",
+    "artist": "Bernardo Bellotto",
+    "year": "c. 1761",
+    "filename": "Bernardo Bellotto and Workshop, View of Munich, c. 1761, NGA 46163.jpg"
+  },
+  {
+    "id": "bellotto-campo-giovanni-paolo",
+    "title": "The Campo di SS. Giovanni e Paolo, Venice",
+    "artist": "Bernardo Bellotto",
+    "year": "1743-1747",
+    "filename": "Bernardo Bellotto, The Campo di SS. Giovanni e Paolo, Venice, 1743-1747, NGA 1144.jpg"
+  }
+]

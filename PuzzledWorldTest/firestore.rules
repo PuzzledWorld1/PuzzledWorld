@@ -30,5 +30,15 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if false;
     }
+
+    // Gallery artwork added automatically by the addDailyGalleryArtwork
+    // scheduled Cloud Function (via the Admin SDK, which bypasses these
+    // rules) once it's passed SafeSearch. Publicly browsable, like the
+    // bundled gallery - guests can list/read it too, but only the
+    // Function can ever write a new entry.
+    match /galleryArtworks/{artworkId} {
+      allow get, list: if true;
+      allow write: if false;
+    }
   }
 }
