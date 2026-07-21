@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
@@ -128,7 +128,13 @@ export default function HomeScreen({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>🧩</Text>
+      <View style={styles.logoBox}>
+        <Image
+          source={require('../assets/adaptive-icon.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
       <Text style={styles.title}>Puzzled World</Text>
       <Text style={styles.subtitle}>
         Turn photos and artwork into puzzles!
@@ -188,10 +194,6 @@ export default function HomeScreen({
         toggleThemeMode={toggleThemeMode}
       />
 
-      <Text style={styles.disclaimer}>
-        Some artwork (e.g. classical/fine art) or user-submitted images may contain nudity.
-      </Text>
-
       {user && (
         <Pressable
           style={styles.deleteAccountCorner}
@@ -219,7 +221,21 @@ export default function HomeScreen({
 function getStyles(colors) {
   return StyleSheet.create(withAppFont({
     container: { flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', padding: 25 },
-    logo: { fontSize: 70, marginBottom: 10 },
+    logoBox: {
+      width: 112,
+      height: 112,
+      borderRadius: 26,
+      backgroundColor: '#ffffff',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 10,
+      shadowColor: '#000000',
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 4,
+    },
+    logo: { width: '210%', height: '210%' },
     title: { fontSize: 40, fontWeight: 'bold', color: colors.textPrimary, marginBottom: 12 },
     subtitle: { color: colors.textSecondary, textAlign: 'center', fontSize: 18, fontWeight: 'bold', marginTop: 10, marginBottom: 24 },
     account: { alignItems: 'center', marginTop: 20, marginBottom: 8 },
@@ -233,13 +249,5 @@ function getStyles(colors) {
     resumeButton: { backgroundColor: colors.resumeButtonBackground, paddingVertical: 15, paddingHorizontal: 35, borderRadius: 18, marginTop: 6, width: '100%', alignItems: 'center' },
     buttonText: { color: colors.buttonText, fontSize: 18, fontWeight: 'bold' },
     spinner: { marginTop: 14 },
-    disclaimer: {
-      color: colors.textSecondary,
-      fontSize: 11,
-      textAlign: 'center',
-      marginTop: 16,
-      paddingHorizontal: 20,
-      opacity: 0.8,
-    },
   }));
 }

@@ -75,7 +75,7 @@ const BOARD_FRAME_INSET = 10;
 
 // Must match container's paddingTop below - used to figure out how much
 // vertical space is actually left for the board (see boardMaxHeight).
-const CONTAINER_PADDING_TOP = 16;
+const CONTAINER_PADDING_TOP = 56;
 
 // Small safety margin so the board doesn't butt right up against the
 // header/tray sections once boardMaxHeight is computed from their
@@ -195,7 +195,7 @@ function resolvePlacement({
 
       memberIds.forEach((memberId) => {
         neighborsOf(memberId, size).forEach(
-          ({ id: neighborId, dRow, dCol }) => {
+          ({ id: neighborId }) => {
             const neighbor = others.find(
               (o) => o.piece === neighborId
             );
@@ -207,13 +207,16 @@ function resolvePlacement({
             // A locked neighbor is guaranteed to already be sitting
             // exactly on ITS true grid position (same space this piece
             // just landed in), so it's adjacent by construction - no
-            // need to double check. An UNLOCKED neighbor with a
-            // matching piece ID could just as easily be mid-assembly
-            // somewhere else entirely, so it only counts if it's
-            // ACTUALLY touching where this piece landed - otherwise two
-            // clusters that were never really connected would get
-            // merged just because their piece IDs happen to be
-            // grid-adjacent.
+            // need to double check. An UNLOCKED neighbor is only safe
+            // to fold in WITHOUT also moving it (this branch never
+            // repositions anything outside `memberIds`) if IT is ALSO
+            // sitting exactly on ITS OWN true board position (checked
+            // against getTarget directly, not just "close to where
+            // this piece expects it") - checking the true absolute grid
+            // instead of relative-to-this-piece keeps a long chain of
+            // merges from ever compounding tiny approximate offsets, and
+            // guarantees nothing gets marked locked/solved without
+            // actually being exactly in its correct spot.
             if (neighbor.locked) {
               neighborGroupIds.add(
                 neighbor.groupId
@@ -222,17 +225,15 @@ function resolvePlacement({
               return;
             }
 
-            const expectedX =
-              finalPositions[memberId].x +
-              dCol * pieceSize;
+            const neighborTarget =
+              getTarget(neighborId);
 
-            const expectedY =
-              finalPositions[memberId].y +
-              dRow * pieceSize;
+            const exactTolerance = 1.5;
 
             if (
-              Math.abs(neighbor.x - expectedX) < snapDistance &&
-              Math.abs(neighbor.y - expectedY) < snapDistance
+              neighborTarget &&
+              Math.abs(neighbor.x - neighborTarget.x) < exactTolerance &&
+              Math.abs(neighbor.y - neighborTarget.y) < exactTolerance
             ) {
               neighborGroupIds.add(
                 neighbor.groupId
@@ -281,18 +282,21 @@ function resolvePlacement({
 
         // Collect every OTHER neighbor group this placement also lines
         // up with, not just the one that triggered the snap - same
-        // bridging concern as the own-slot branch above.
+        // bridging concern as the own-slot branch above, and the same
+        // fix: a LOCKED other-neighbor is guaranteed exact (safe to
+        // adopt outright), but an unlocked one only gets bridged in if
+        // IT is ALSO sitting exactly on its OWN true board position
+        // (checked against getTarget directly - see the own-slot
+        // branch's comment for why absolute beats relative here).
         const neighborGroupIds = new Set([
           neighbor.groupId,
         ]);
 
+        const exactTolerance = 1.5;
+
         memberIds.forEach((memberId) => {
           neighborsOf(memberId, size).forEach(
-            ({
-              id: otherNeighborId,
-              dRow: otherDRow,
-              dCol: otherDCol,
-            }) => {
+            ({ id: otherNeighborId }) => {
               const otherNeighbor = others.find(
                 (o) =>
                   o.piece ===
@@ -303,23 +307,27 @@ function resolvePlacement({
                 return;
               }
 
-              const otherExpectedX =
-                finalPositions[memberId].x +
-                otherDCol * pieceSize;
+              if (otherNeighbor.locked) {
+                neighborGroupIds.add(
+                  otherNeighbor.groupId
+                );
 
-              const otherExpectedY =
-                finalPositions[memberId].y +
-                otherDRow * pieceSize;
+                return;
+              }
+
+              const otherNeighborTarget =
+                getTarget(otherNeighborId);
 
               if (
+                otherNeighborTarget &&
                 Math.abs(
                   otherNeighbor.x -
-                    otherExpectedX
-                ) < snapDistance &&
+                    otherNeighborTarget.x
+                ) < exactTolerance &&
                 Math.abs(
                   otherNeighbor.y -
-                    otherExpectedY
-                ) < snapDistance
+                    otherNeighborTarget.y
+                ) < exactTolerance
               ) {
                 neighborGroupIds.add(
                   otherNeighbor.groupId
@@ -470,18 +478,20 @@ function TrayPiece({
   // activeOffsetY/failOffsetX let the tray's horizontal ScrollView keep
   // handling horizontal swipes - this gesture only takes over once the
   // finger has moved vertically past the threshold, mirroring the old
-  // PanResponder's "vertical > horizontal" check. The gap between the two
-  // thresholds needs to be wide: a diagonal drag grows X and Y together,
-  // so a tight gap (e.g. 8 vs 10) turns activation into a coin-flip race
-  // between "pick up the piece" and "cancel into a scroll", which reads
-  // as stutter/dropped drags. Picking up a piece is the overwhelmingly
-  // common intent for a touch that starts ON a piece, so this leans hard
-  // toward that: activation needs almost no vertical movement, and it
-  // takes a heavily horizontal-dominant gesture to fail into a scroll.
+  // PanResponder's "vertical > horizontal" check. These used to be much
+  // further apart (3 vs 45) to bias hard toward "pick up the piece",
+  // which made picking a piece up feel great but meant a swipe had to
+  // travel a full 45px of pure-horizontal motion before the tray would
+  // hand off to scrolling - any real swipe has a little vertical wobble
+  // in it, so that whole 45px was effectively a dead zone where NEITHER
+  // a drag nor a scroll was happening. Narrowing the gap (6 vs 18) still
+  // recognizes a genuine vertical pull-out almost instantly, but lets a
+  // mostly-horizontal swipe fail into a scroll much sooner instead of
+  // eating the first third of it doing nothing.
   const pan =
     Gesture.Pan()
-      .activeOffsetY([-3, 3])
-      .failOffsetX([-45, 45])
+      .activeOffsetY([-6, 6])
+      .failOffsetX([-18, 18])
       .onTouchesDown(() => {
         // Fires the instant a finger lands on a piece, well before any
         // activation threshold is met - disabling the tray's scroll
@@ -1258,11 +1268,23 @@ export default function PuzzleScreen({
   // which happens after mount - so a resumed puzzle's grid-unit
   // positions (relative to the board origin, portable across screen
   // sizes) can only be converted back to pixels here, not in the
-  // seeding effect above.
+  // seeding effect above. This only ever runs ONCE per resume (the ref
+  // is cleared right after), so it has to wait for boardLayout's FINAL
+  // value, not just its first one - the board's size/position can shift
+  // across the first few renders while the header/tray/footer sections
+  // above and below it are still being measured (see boardMaxHeight),
+  // and converting against an early, not-yet-settled boardLayout would
+  // lock these resumed pieces in at the wrong spot permanently (locked
+  // pieces can't be dragged again to fix it). Waiting for all three
+  // measurements to be in first is a reasonable proxy for "layout has
+  // settled."
   useEffect(() => {
     if (
       !boardLayout ||
-      !pendingResumeLoosePiecesRef.current
+      !pendingResumeLoosePiecesRef.current ||
+      !headerHeight ||
+      !traySectionHeight ||
+      !footerHeight
     ) {
       return;
     }
@@ -1286,6 +1308,9 @@ export default function PuzzleScreen({
   }, [
     boardLayout,
     pieceSize,
+    headerHeight,
+    traySectionHeight,
+    footerHeight,
   ]);
 
 
@@ -1883,133 +1908,6 @@ export default function PuzzleScreen({
     ]);
 
 
-  const borderPieceIds =
-    useMemo(() => {
-      const ids = [];
-
-      for (
-        let p = 0;
-        p < totalPieces;
-        p++
-      ) {
-        const row =
-          Math.floor(p / size);
-
-        const col =
-          p % size;
-
-        if (
-          row === 0 ||
-          row === size - 1 ||
-          col === 0 ||
-          col === size - 1
-        ) {
-          ids.push(p);
-        }
-      }
-
-      return ids;
-    }, [
-      totalPieces,
-      size,
-    ]);
-
-
-  // Skips the celebration for a resumed puzzle whose border was already
-  // finished in an earlier session - only a border completed just now,
-  // in this session, should trigger it.
-  const borderCelebratedRef =
-    useRef(
-      (() => {
-        if (!resumeState) {
-          return false;
-        }
-
-        const lockedIds =
-          new Set(
-            resumeState.loosePieces
-              .filter(
-                (item) => item.locked
-              )
-              .map(
-                (item) => item.piece
-              )
-          );
-
-        return borderPieceIds.every(
-          (id) => lockedIds.has(id)
-        );
-      })()
-    );
-
-  // A quick round of sparkles across every border piece the moment the
-  // outer frame closes up, regardless of how much (if any) of the
-  // interior is done - completing the border is its own small win.
-  useEffect(() => {
-    if (
-      borderCelebratedRef.current
-    ) {
-      return;
-    }
-
-    const lockedIds =
-      new Set(
-        loosePieces
-          .filter(
-            (item) => item.locked
-          )
-          .map(
-            (item) => item.piece
-          )
-      );
-
-    const borderComplete =
-      borderPieceIds.every(
-        (id) => lockedIds.has(id)
-      );
-
-    if (!borderComplete) {
-      return;
-    }
-
-    borderCelebratedRef.current = true;
-
-    // Spread across the border instead of firing all at once - a
-    // simultaneous burst on every border piece reads as a single instant
-    // flash rather than a little fireworks show.
-    const spawnWindowMs = 1800;
-
-    const timers = borderPieceIds.map(
-      (id, index) => {
-        const delay =
-          (index / borderPieceIds.length) *
-            spawnWindowMs +
-          Math.random() * 150;
-
-        return setTimeout(() => {
-          const target =
-            getTarget(id);
-
-          if (target) {
-            addSparkle(
-              target.x + pieceSize / 2,
-              target.y + pieceSize / 2
-            );
-          }
-        }, delay);
-      }
-    );
-
-    return () => {
-      timers.forEach(clearTimeout);
-    };
-  }, [
-    loosePieces,
-    borderPieceIds,
-    getTarget,
-    addSparkle,
-    pieceSize,
-  ]);
 
 
   // Solved once every piece is out of the tray and connected into a
@@ -2080,7 +1978,6 @@ export default function PuzzleScreen({
       setTrayDragPiece(null);
       setSparkles([]);
 
-      borderCelebratedRef.current = false;
       startTimeRef.current = Date.now();
 
       setTimedOut(false);
@@ -2350,15 +2247,6 @@ export default function PuzzleScreen({
           }
         />
 
-        <Text
-          style={
-            styles.title
-          }
-        >
-          Get Puzzled!
-        </Text>
-
-
         {artworkTitle ? (
           <Text
             style={
@@ -2574,14 +2462,16 @@ export default function PuzzleScreen({
 
 
       <View
-        style={
-          styles.footerRow
-        }
         onLayout={
           (event) =>
             setFooterHeight(
               event.nativeEvent.layout.height
             )
+        }
+      >
+      <View
+        style={
+          styles.footerRow
         }
       >
         <Pressable
@@ -2691,6 +2581,35 @@ export default function PuzzleScreen({
             styles.backButton
           }
         />
+      </View>
+
+      <View
+        style={
+          styles.brandRow
+        }
+      >
+        <View
+          style={
+            styles.brandLogoBox
+          }
+        >
+          <Image
+            source={require('../assets/adaptive-icon.png')}
+            style={
+              styles.brandLogo
+            }
+            resizeMode="contain"
+          />
+        </View>
+
+        <Text
+          style={
+            styles.brandText
+          }
+        >
+          Puzzled World
+        </Text>
+      </View>
       </View>
 
 
@@ -2943,18 +2862,6 @@ function getStyles(colors) {
     },
 
 
-    title: {
-      color:
-        colors.textPrimary,
-
-      fontSize:
-        30,
-
-      fontWeight:
-        'bold',
-    },
-
-
     subtitle: {
       color:
         colors.textSecondary,
@@ -2969,7 +2876,7 @@ function getStyles(colors) {
         24,
 
       marginTop:
-        4,
+        0,
 
       marginBottom:
         16,
@@ -3157,6 +3064,69 @@ function getStyles(colors) {
 
       width:
         '100%',
+    },
+
+
+    brandRow: {
+      flexDirection:
+        'row',
+
+      alignItems:
+        'center',
+
+      justifyContent:
+        'center',
+
+      marginTop:
+        10,
+
+      marginBottom:
+        4,
+    },
+
+
+    brandLogoBox: {
+      width:
+        30,
+
+      height:
+        30,
+
+      borderRadius:
+        9,
+
+      backgroundColor:
+        '#ffffff',
+
+      alignItems:
+        'center',
+
+      justifyContent:
+        'center',
+
+      marginRight:
+        6,
+    },
+
+
+    brandLogo: {
+      width:
+        '210%',
+
+      height:
+        '210%',
+    },
+
+
+    brandText: {
+      color:
+        '#ffffff',
+
+      fontSize:
+        15,
+
+      fontWeight:
+        'bold',
     },
 
 

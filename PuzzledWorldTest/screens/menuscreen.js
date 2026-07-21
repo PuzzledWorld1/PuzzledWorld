@@ -156,13 +156,13 @@ export default function MenuScreen({
       style={styles.scroll}
       contentContainerStyle={styles.container}
     >
-      <Text style={styles.logo}>
-        🧩
-      </Text>
-
-      <Text style={styles.title}>
-        Get Puzzled
-      </Text>
+      <View style={styles.logoBox}>
+        <Image
+          source={require('../assets/adaptive-icon.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
 
 
       <Pressable
@@ -293,17 +293,21 @@ function getStyles(colors) {
       paddingVertical: 30,
     },
 
-    logo: {
-      fontSize: 44,
-      marginBottom: 4,
+    logoBox: {
+      width: 80,
+      height: 80,
+      borderRadius: 20,
+      backgroundColor: '#ffffff',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 12,
+      shadowColor: '#000000',
+      shadowOpacity: 0.2,
+      shadowRadius: 5,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 4,
     },
-
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: colors.textPrimary,
-      marginBottom: 8,
-    },
+    logo: { width: '210%', height: '210%' },
 
     button: {
       backgroundColor: colors.buttonSecondary,

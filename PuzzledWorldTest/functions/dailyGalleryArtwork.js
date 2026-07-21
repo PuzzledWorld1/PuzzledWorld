@@ -10,6 +10,17 @@ const pool = require('./dailyArtworkPool.json');
 // day if the pool has plenty of other unused options left.
 const MAX_ATTEMPTS = 5;
 
+// Gallery art is auto-published with no human review, so it holds to a
+// tighter bar than the shared checkSafeSearch threshold (LIKELY/
+// VERY_LIKELY) used for user-submitted photos - even a "POSSIBLE" rating
+// on adult/racy content is enough to skip a candidate here, so the
+// gallery stays nudity-free rather than merely low-risk.
+const NUDITY_RISK_LIKELIHOODS = new Set([
+  'POSSIBLE',
+  'LIKELY',
+  'VERY_LIKELY',
+]);
+
 
 function commonsFilePathUrl(filename, width) {
   return (
@@ -65,7 +76,11 @@ async function tryPublishCandidate(candidate, db, bucket) {
     const gcsUri = `gs://${bucket.name}/${stagingPath}`;
     const { flagged, safeSearch } = await checkSafeSearch(gcsUri);
 
-    if (flagged) {
+    const nudityRisk =
+      NUDITY_RISK_LIKELIHOODS.has(safeSearch.adult) ||
+      NUDITY_RISK_LIKELIHOODS.has(safeSearch.racy);
+
+    if (flagged || nudityRisk) {
       logger.warn('SafeSearch flagged daily artwork candidate - skipping', {
         id: candidate.id,
         safeSearch,
@@ -117,11 +132,12 @@ async function tryPublishCandidate(candidate, db, bucket) {
 
 // Once a day, adds one new public-domain artwork to the gallery without
 // requiring an app update: picks a random unused candidate from
-// dailyArtworkPool.json, moderates it with the same SafeSearch check as
-// user-submitted photos, and publishes it if it passes. See
-// functions/dailyArtworkPool.json for how to top up the candidate list
-// once it runs low - the pool is a curated list of low-nudity-risk NGA
-// works, but SafeSearch (not manual pre-viewing) is the real gate here.
+// dailyArtworkPool.json, moderates it with SafeSearch (plus the extra
+// NUDITY_RISK_LIKELIHOODS check above), and publishes it if it passes.
+// See functions/dailyArtworkPool.json for how to top up the candidate
+// list once it runs low - the pool is a curated list of low-nudity-risk
+// NGA works, but SafeSearch (not manual pre-viewing) is the real gate
+// that keeps the published gallery nudity-free.
 exports.addDailyGalleryArtwork = onSchedule(
   {
     schedule: 'every day 06:00',

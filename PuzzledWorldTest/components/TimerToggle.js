@@ -98,7 +98,7 @@ function getStyles(colors) {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 6,
+      marginBottom: 0,
     },
 
     toggle: {
